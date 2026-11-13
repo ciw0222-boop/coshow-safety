@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>제3회 CO-SHOW 안전상황실</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Pretendard,'Malgun Gothic',sans-serif;background:#0b1220;color:#e7ecf5;font-size:16px}
+header{position:sticky;top:0;z-index:5;background:#0f1a30;border-bottom:1px solid #22304d;padding:12px 14px}
+header h1{margin:0;font-size:17px}
+header small{color:#8fa0bf}
+nav{display:flex;gap:6px;margin-top:10px}
+nav button{flex:1;padding:9px 0;border:0;border-radius:10px;background:#18243f;color:#b9c6de;font-size:14px;font-weight:600}
+nav button.on{background:#e8493f;color:#fff}
+main{padding:12px 12px 90px;max-width:720px;margin:0 auto}
+.card{background:#121c33;border:1px solid #22304d;border-radius:14px;padding:12px;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;padding:3px 8px;border-radius:99px;background:#22304d;color:#c9d4ea;white-space:nowrap}
+.r-고{background:#e8493f;color:#fff}.r-중{background:#f2a33a;color:#1b1300}.r-저{background:#2f8f5b;color:#fff}
+.s-접수{background:#3b5bdb;color:#fff}.s-처리중{background:#f2a33a;color:#1b1300}.s-종결{background:#3a4560;color:#c9d4ea}
+.muted{color:#8fa0bf;font-size:13px}
+.txt{white-space:pre-wrap;margin:8px 0 2px;line-height:1.45}
+label{display:block;font-size:13px;color:#8fa0bf;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #2b3a5c;background:#0b1428;color:#e7ecf5;font-size:16px;font-family:inherit}
+textarea{min-height:90px}
+.btn{display:inline-block;padding:12px 14px;border-radius:12px;border:0;background:#e8493f;color:#fff;font-weight:700;font-size:15px;text-decoration:none;text-align:center}
+.btn.gray{background:#22304d;color:#dfe6f3}.btn.full{width:100%}
+.seg{display:flex;gap:6px}.seg button{flex:1;padding:10px 0;border-radius:10px;border:1px solid #2b3a5c;background:#0b1428;color:#c9d4ea;font-size:15px}
+.seg button.on{border-color:#e8493f;background:#3a1416;color:#fff;font-weight:700}
+.fab{position:fixed;right:16px;bottom:18px;z-index:6;border-radius:99px;padding:15px 20px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.filters{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
+.filters button{padding:7px 12px;border-radius:99px;border:1px solid #2b3a5c;background:transparent;color:#b9c6de;font-size:13px;white-space:nowrap}
+.filters button.on{background:#e7ecf5;color:#0b1220}
+.call{display:flex;gap:6px;margin-top:8px}.call a{flex:1;font-size:14px;padding:10px}
+.log{font-size:12px;color:#8fa0bf;white-space:pre-wrap;border-top:1px dashed #2b3a5c;margin-top:8px;padding-top:6px}
+.now{border-color:#e8493f}
+.date{font-weight:700;margin:14px 2px 6px;color:#ffd4d1}
+#login{max-width:360px;margin:16vh auto;padding:0 16px;text-align:center}
+#login h2{margin:0 0 6px}
+.sheet{position:fixed;inset:0;background:rgba(5,9,18,.7);z-index:10;display:none;align-items:flex-end;justify-content:center}
+.sheet .box{background:#0f1a30;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px 24px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e7ecf5;color:#0b1220;padding:10px 16px;border-radius:99px;font-weight:700;display:none;z-index:20}
+.over{color:#ff8f87;font-weight:700}
+.thumbs a{color:#8cb4ff;font-size:13px;margin-right:8px}
+</style>
+</head>
+<body>
+<div id="login">
+  <h2>🛟 안전상황실</h2>
+  <p class="muted" id="evName">제3회 CO-SHOW</p>
+  <label>입장 비밀번호</label>
+  <input id="pw" type="password" inputmode="numeric" autocomplete="off">
+  <label>내 이름 (기록자로 남아요)</label>
+  <input id="me" placeholder="예: 최제욱">
+  <p></p>
+  <button class="btn full" onclick="doLogin()">입장</button>
+  <p class="muted" id="loginMsg"></p>
+</div>
+
+<div id="app" style="display:none">
+<header>
+  <h1 id="title">🛟 안전상황실</h1>
+  <small id="sub"></small>
+  <nav>
+    <button data-t="rec" class="on" onclick="tab('rec')">상황기록</button>
+    <button data-t="con" onclick="tab('con')">연락망</button>
+    <button data-t="duty" onclick="tab('duty')">근무표</button>
+    <button data-t="med" onclick="tab('med')">의료</button>
+  </nav>
+</header>
+<main id="main"></main>
+<button class="btn fab" id="fab" onclick="openNew()">+ 상황 기록</button>
+</div>
+
+<div class="sheet" id="sheet"><div class="box" id="sheetBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>window.onerror=function(m,s,l,c){var e=document.getElementById('loginMsg');if(e)e.textContent+=' / 오류: '+m+' ('+l+':'+c+')';};</script>
+<script>
+// 주의: 구글이 이 안의 별표 주석 시작 모양(슬래시+별표)을 주석으로 읽어 뒤를 자름 → 글자 안에서는 \x2a, \/\/ 로 적는다
+// 구글 웹앱 틀 안에서는 저장소가 막힐 수 있어 오류가 나도 멈추지 않게
+const LS = { get(k){ try { return localStorage.getItem(k) || '' } catch(e){ return '' } }, set(k,v){ try { localStorage.setItem(k,v) } catch(e){} }, del(k){ try { localStorage.removeItem(k) } catch(e){} } };
+let PW = LS.get('sr_pw'), ME = LS.get('sr_me');
+let D = null, CUR = 'rec', FIL = '진행', NEWP = [];
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const telOf = s => String(s || '').replace(/[^0-9+]/g, '');
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',1600)}
+const API = 'https://script.google.com/macros/s/AKfycbzy0KeI4pqpqpHw1bkyZqRV_NYLGzyb-Jt48OZwtBBW4PhRfdabp1wWDX8sGkwi5Rvk/exec';
+async function run(fn, ...a){ const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args: a }) }); const j = await r.json(); if (!j.ok) throw new Error(j.error); return j.data; }
+
+$('#me').value = ME;
+if (PW) { $('#pw').value = PW; doLogin(true); }
+
+async function doLogin(auto){
+  const pw = $('#pw').value.trim(), me = $('#me').value.trim();
+  if (!me && !auto) { $('#loginMsg').textContent = '이름을 적어 주세요'; return; }
+  $('#loginMsg').textContent = '확인 중…';
+  try {
+    D = await run('loadAll', pw);
+    PW = pw; ME = me || ME; LS.set('sr_pw', PW); LS.set('sr_me', ME);
+    $('#login').style.display = 'none'; $('#app').style.display = 'block';
+    $('#title').textContent = '🛟 ' + D.event + ' 안전상황실';
+    render(); setInterval(refresh, 30000);
+  } catch (e) {
+    LS.del('sr_pw');
+    $('#loginMsg').textContent = auto ? '' : '❌ ' + (e.message || e);
+  }
+}
+async function refresh(){ try { D = await run('loadAll', PW); if (!$('#sheet').style.display || $('#sheet').style.display==='none') render(); } catch(e){} }
+
+function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#fab').style.display=t==='rec'?'block':'none';render()}
+
+function render(){
+  const open = D.rec.filter(r=>r['상태']!=='종결').length;
+  $('#sub').textContent = (ME?ME+' · ':'') + '진행 중 ' + open + '건 · ' + D.now + ' 기준';
+  ({rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed})[CUR]();
+}
+
+function renderRec(){
+  const f = {진행:r=>r['상태']!=='종결', 고위험:r=>r['위험도']==='고', 종결:r=>r['상태']==='종결', 전체:()=>true}[FIL];
+  const list = D.rec.filter(f);
+  let h = '<div class="filters">' + ['진행','고위험','종결','전체'].map(k=>`<button class="${k===FIL?'on':''}" onclick="FIL='${k}';render()">${k}</button>`).join('') + '</div>';
+  if (!list.length) h += '<p class="muted">기록이 없어요.</p>';
+  const nowT = new Date(D.now.replace(' ','T')+':00');
+  list.forEach(r=>{
+    const re = r['재확인시각']; const over = re && r['상태']!=='종결' && new Date(re.replace(' ','T')+':00') <= nowT;
+    h += `<div class="card" onclick="openRec('${esc(r['ID'])}')">
+      <div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span><span class="chip s-${esc(r['상태'])}">${esc(r['상태'])}</span><span class="chip">${esc(r['분류'])}</span><span class="muted">${esc(r['장소'])}</span></div>
+      <div class="txt">${esc(r['내용'])}</div>
+      <div class="muted">${esc(r['접수시각'])} · ${esc(r['기록자'])}${re?` · <span class="${over?'over':''}">⏰ 재확인 ${esc(re)}${over?' 지남':''}</span>`:''}${r['사진']?' · 📷':''}</div>
+    </div>`;
+  });
+  $('#main').innerHTML = h;
+}
+
+// 번호가 여러 개면(쉼표·빗금) 나눠서 버튼을 따로, 문자 버튼은 휴대폰(01…)에만
+function callBtns(p){ const ns = String(p || '').split(/[,\/·]/).map(telOf).filter(Boolean); return ns.length ? `<div class="call">${ns.map(t => `<a class="btn gray" href="tel:${t}">📞 ${ns.length > 1 ? t : '전화'}</a>` + (/^01/.test(t) ? `<a class="btn gray" href="sms:${t}">💬 문자</a>` : '')).join('')}</div>` : ''; }
+
+function renderCon(){
+  if (!D.con.length) { $('#main').innerHTML = '<p class="muted">연락망이 비어 있어요. 구글 시트 「연락망」 탭에 적으면 여기에 떠요.</p>'; return; }
+  let h = '', g = '';
+  D.con.forEach(c=>{ if (c['구분']!==g){ g=c['구분']; h+=`<div class="date">${esc(g||'기타')}</div>`; }
+    h += `<div class="card"><div class="row"><b>${esc(c['이름'])}</b><span class="chip">${esc(c['역할'])}</span></div><div class="muted">${esc(c['전화'])} ${esc(c['비고'])}</div>${callBtns(c['전화'])}</div>`; });
+  $('#main').innerHTML = h;
+}
+
+function renderDuty(){
+  if (!D.duty.length) { $('#main').innerHTML = '<p class="muted">근무표가 비어 있어요. 구글 시트 「근무표」 탭에 적으면 여기에 떠요.</p>'; return; }
+  const [today, nowHM] = D.now.split(' ');
+  let h = '', g = '';
+  D.duty.forEach(d=>{ if (d['날짜']!==g){ g=d['날짜']; h+=`<div class="date">${esc(g)}</div>`; }
+    const on = d['날짜']===today && d['시작']<=nowHM && nowHM<d['끝'];
+    h += `<div class="card ${on?'now':''}"><div class="row"><b>${esc(d['시작'])}~${esc(d['끝'])}</b><span class="chip">${esc(d['위치'])}</span>${on?'<span class="chip r-고">지금 근무</span>':''}</div><div>${esc(d['이름'])} <span class="muted">${esc(d['역할'])}</span></div>${callBtns(d['전화'])}</div>`; });
+  $('#main').innerHTML = h;
+}
+
+function renderMed(){
+  let h = '<div class="card"><b>🚨 응급 119</b><div class="call"><a class="btn" href="tel:119">📞 119</a></div></div>';
+  if (!D.med.length) h += '<p class="muted">의료 목록이 비어 있어요. 구글 시트 「의료」 탭에 적으면 여기에 떠요.</p>';
+  let g = '';
+  D.med.forEach(m=>{ if (m['구분']!==g){ g=m['구분']; h+=`<div class="date">${esc(g)}</div>`; }
+    h += `<div class="card"><b>${esc(m['이름'])}</b> <span class="muted">${esc(m['거리'])}</span><div class="muted">${esc(m['주소'])}</div><div class="muted">${esc(m['운영'])}</div>
+      <div class="call">${telOf(m['전화'])?`<a class="btn gray" href="tel:${telOf(m['전화'])}">📞 ${esc(m['전화'])}</a>`:''}<a class="btn gray" href="https:\/\/map.kakao.com/?q=${encodeURIComponent(m['주소']||m['이름'])}">🗺 지도</a></div></div>`; });
+  $('#main').innerHTML = h;
+}
+
+function seg(name, opts, val){ return `<div class="seg" data-n="${name}">` + opts.map(o=>`<button type="button" class="${o===val?'on':''}" onclick="pick(this)">${o}</button>`).join('') + '</div>'; }
+function pick(b){ b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); }
+function segVal(n){ const b = document.querySelector(`.seg[data-n="${n}"] button.on`); return b ? b.textContent : ''; }
+function opts(list, val){ return '<option value="">선택</option>' + list.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join(''); }
+function sheet(html){ $('#sheetBox').innerHTML = html; $('#sheet').style.display='flex'; }
+function closeSheet(){ $('#sheet').style.display='none'; NEWP=[]; render(); }
+$('#sheet').addEventListener('click', e=>{ if (e.target.id==='sheet') closeSheet(); });
+
+function openNew(){
+  NEWP = [];
+  sheet(`<h3 style="margin:4px 0">새 상황 기록</h3>
+    <label>위험도</label>${seg('risk',['고','중','저'],'저')}
+    <label>분류</label><select id="f_cat">${opts(D.cats,'')}</select>
+    <label>장소</label><input id="f_place" list="plist" placeholder="예: 전시홀 B 입구"><datalist id="plist">${D.places.map(p=>`<option value="${esc(p)}">`).join('')}</datalist>
+    <label>무슨 일인가요</label><textarea id="f_text" placeholder="누가 · 어디서 · 어떤 상황"></textarea>
+    <label>바로 한 조치 (선택)</label><textarea id="f_action" style="min-height:60px"></textarea>
+    <label>재확인 시각 (선택)</label><input id="f_re" type="datetime-local">
+    <label>사진 (선택)</label>\x3cinput type="file" accept="image/\x2a" multiple onchange="addPhotos(this.files)"><div class="muted" id="pinfo"></div>
+    <p></p><button class="btn full" id="saveBtn" onclick="saveNew()">기록 남기기</button>
+    <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>`);
+}
+
+function shrink(file){ return new Promise(ok=>{ const fr=new FileReader(); fr.onload=()=>{ const im=new Image(); im.onload=()=>{ const m=1600, s=Math.min(1,m/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=im.width*s; c.height=im.height*s; c.getContext('2d').drawImage(im,0,0,c.width,c.height); ok({name:file.name.replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',data:c.toDataURL('image/jpeg',0.82).split(',')[1]}); }; im.src=fr.result; }; fr.readAsDataURL(file); }); }
+async function addPhotos(files){ for (const f of files) NEWP.push(await shrink(f)); const p=$('#pinfo'); if(p) p.textContent='사진 '+NEWP.length+'장 준비됨'; }
+const dt = v => v ? v.replace('T',' ') : '';
+
+async function saveNew(){
+  const r = { by:ME, risk:segVal('risk'), cat:$('#f_cat').value, place:$('#f_place').value.trim(), text:$('#f_text').value.trim(), action:$('#f_action').value.trim(), recheck:dt($('#f_re').value), photos:NEWP };
+  if (!r.text) { toast('내용을 적어 주세요'); return; }
+  $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
+  try { await run('addRec', PW, r); toast('✅ 기록됨'); D = await run('loadAll', PW); closeSheet(); }
+  catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='기록 남기기'; }
+}
+
+function openRec(id){
+  const r = D.rec.find(x=>x['ID']===id); if (!r) return; NEWP = [];
+  const photos = (r['사진']||'').split('\n').filter(Boolean).map((u,i)=>`<a href="${esc(u)}" target="_blank">📷 사진 ${i+1}</a>`).join('');
+  sheet(`<div class="row"><span class="chip">${esc(r['ID'])}</span><span class="muted">${esc(r['접수시각'])} · ${esc(r['기록자'])}</span></div>
+    <label>상태</label>${seg('st',['접수','처리중','종결'],r['상태'])}
+    <label>위험도</label>${seg('risk',['고','중','저'],r['위험도'])}
+    <label>분류</label><select id="e_cat">${opts(D.cats,r['분류'])}</select>
+    <label>장소</label><input id="e_place" value="${esc(r['장소'])}">
+    <label>내용</label><textarea id="e_text">${esc(r['내용'])}</textarea>
+    <label>조치</label><textarea id="e_action" style="min-height:60px">${esc(r['조치'])}</textarea>
+    <label>후속조치</label><textarea id="e_follow" style="min-height:60px">${esc(r['후속조치'])}</textarea>
+    <label>재확인 시각</label><input id="e_re" type="datetime-local" value="${esc((r['재확인시각']||'').replace(' ','T'))}">
+    <label>사진</label><div class="thumbs">${photos||'<span class="muted">없음</span>'}</div>\x3cinput type="file" accept="image/\x2a" multiple onchange="addPhotos(this.files)"><div class="muted" id="pinfo"></div>
+    <p></p><button class="btn full" id="saveBtn" onclick="saveRec('${esc(r['ID'])}')">저장</button>
+    <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>
+    <div class="log">${esc(r['처리이력'])}</div>`);
+}
+
+async function saveRec(id){
+  const u = { by:ME, '상태':segVal('st'), '위험도':segVal('risk'), '분류':$('#e_cat').value, '장소':$('#e_place').value.trim(), '내용':$('#e_text').value.trim(), '조치':$('#e_action').value.trim(), '후속조치':$('#e_follow').value.trim(), '재확인시각':dt($('#e_re').value), photos:NEWP };
+  $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
+  try { await run('updRec', PW, id, u); toast('✅ 저장됨'); D = await run('loadAll', PW); closeSheet(); }
+  catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='저장'; }
+}
+</script>
+</body>
+</html>
