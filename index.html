@@ -8,17 +8,17 @@
 <title>제3회 CO-SHOW 안전상황실</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-:root{--bg:#0a1020;--panel:#131c31;--panel2:#18233c;--line:#26344f;--text:#eef2f9;--mute:#a1aec6;--accent:#ff5a4e;--hi:#ff5a4e;--mid:#ffab2e;--lo:#34c98a}
+:root{--bg:#0a1020;--panel:#131c31;--panel2:#18233c;--line:#26344f;--text:#eef2f9;--mute:#a1aec6;--accent:#38bdf8;--grad:linear-gradient(135deg,#2f6bff,#16b8e0);--glow:rgba(56,160,255,.38);--hi:#ff5a4e;--mid:#ffab2e;--lo:#34c98a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:Pretendard,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.5;letter-spacing:-.01em}
-header{position:sticky;top:0;z-index:5;background:rgba(10,16,32,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px 8px}
+header{position:sticky;top:0;z-index:5;background:rgba(10,16,32,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(56,189,248,.28);box-shadow:0 1px 14px rgba(56,160,255,.12);padding:12px 14px 8px}
 header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em}
 header small{display:flex;align-items:center;gap:6px;margin-top:2px;color:var(--mute);font-size:13px}
 header small::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--lo);box-shadow:0 0 0 3px rgba(52,201,138,.2)}
 nav{display:flex;gap:4px;margin-top:10px}
 nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;border:0;border-radius:12px;background:transparent;color:var(--mute);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
 nav button i{font-style:normal;font-size:19px;line-height:1}
-nav button.on{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(255,90,78,.35)}
+nav button.on{background:var(--grad);color:#fff;box-shadow:0 4px 16px var(--glow)}
 main{padding:14px 14px 104px;max-width:720px;margin:0 auto}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 14px 13px;margin-bottom:10px}
 .card.rec{border-left:5px solid #3a4560;cursor:pointer}
@@ -41,17 +41,17 @@ main{padding:14px 14px 104px;max-width:720px;margin:0 auto}
 .info{color:var(--mute);font-size:13.5px;margin-top:3px}
 label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:14px 0 6px}
 input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:var(--text);font-size:16px;font-family:inherit;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,90,78,.18)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(56,189,248,.2)}
 textarea{min-height:96px;line-height:1.5}
-.btn{display:inline-block;padding:13px 14px;border-radius:12px;border:0;background:var(--accent);color:#fff;font-weight:800;font-size:15px;font-family:inherit;text-decoration:none;text-align:center;cursor:pointer}
+.btn{display:inline-block;padding:13px 14px;border-radius:12px;border:0;background:var(--grad);color:#fff;font-weight:800;font-size:15px;font-family:inherit;text-decoration:none;text-align:center;cursor:pointer}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.6}
 .btn.gray{background:var(--panel2);color:#e3e9f5;border:1px solid #2e3e62}
 .btn.full{width:100%}
 .btn.danger{background:transparent;color:#ff8f87;border:1px solid rgba(255,90,78,.45)}
 .seg{display:flex;gap:6px}.seg button{flex:1;padding:11px 0;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:#c9d4ea;font-size:15px;font-weight:600;font-family:inherit}
-.seg button.on{border-color:var(--accent);background:rgba(255,90,78,.16);color:#fff;font-weight:800}
-.fab{position:fixed;right:16px;bottom:20px;z-index:6;border-radius:99px;padding:15px 22px;font-size:16px;box-shadow:0 8px 24px rgba(255,90,78,.45)}
+.seg button.on{border-color:var(--accent);background:rgba(56,189,248,.15);color:#fff;font-weight:800}
+.fab{position:fixed;right:16px;bottom:20px;z-index:6;border-radius:99px;padding:15px 22px;font-size:16px;box-shadow:0 8px 24px var(--glow)}
 .filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
 .filters button{padding:8px 14px;border-radius:99px;border:1px solid #2e3e62;background:transparent;color:#c3cee3;font-size:14px;font-weight:600;font-family:inherit;white-space:nowrap}
 .filters button b{margin-left:4px;color:var(--mute);font-weight:700}
@@ -60,7 +60,7 @@ textarea{min-height:96px;line-height:1.5}
 .call{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.call a{flex:1 1 40%;font-size:14.5px;padding:11px 8px}
 .log{font-size:12.5px;color:var(--mute);white-space:pre-wrap;border-top:1px dashed #2e3e62;margin-top:14px;padding-top:10px;line-height:1.6}
 .now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-.date{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin:22px 2px 10px;color:#ffc9c4}
+.date{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin:22px 2px 10px;color:#7dd3fc}
 .date:first-child{margin-top:4px}
 .date::after{content:'';flex:1;height:1px;background:var(--line)}
 .date span{color:var(--mute);font-weight:600;font-size:12.5px}
@@ -81,16 +81,16 @@ textarea{min-height:96px;line-height:1.5}
 .stat div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;font-size:12.5px;font-weight:600;color:var(--mute)}
 .stat b{display:block;font-size:26px;font-weight:800;color:var(--text);line-height:1.2}
 .bars{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:4px 14px 12px;margin-top:12px}
-.bars h3{font-size:14px;font-weight:800;margin:16px 0 8px;color:#ffc9c4}
+.bars h3{font-size:14px;font-weight:800;margin:16px 0 8px;color:#7dd3fc}
 .bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
 .bar span{width:110px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar i{display:block;height:12px;background:linear-gradient(90deg,#ff5a4e,#ff8a5c);border-radius:6px;min-width:3px}
+.bar i{display:block;height:12px;background:linear-gradient(90deg,#2f6bff,#22d3ee);border-radius:6px;box-shadow:0 0 8px rgba(56,160,255,.35);min-width:3px}
 .bar em{font-style:normal;color:var(--mute);font-weight:700}
 .cbar{display:flex;gap:8px;margin-bottom:12px}
 .cbar select{flex:0 0 46%;font-weight:700}
 .cbar input{flex:1;min-width:0}
 .clist{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}
-.lhead{display:flex;justify-content:space-between;padding:9px 14px;background:#0f182c;font-size:13px;font-weight:800;color:#ffc9c4;border-bottom:1px solid var(--line)}
+.lhead{display:flex;justify-content:space-between;padding:9px 14px;background:#0f182c;font-size:13px;font-weight:800;color:#7dd3fc;border-bottom:1px solid var(--line)}
 .lhead span{color:var(--mute);font-weight:600}
 .crow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
 .crow:last-child{border-bottom:0}
@@ -206,7 +206,7 @@ function renderAdm(){
   const day = cnt(R, r => (r['접수시각'] || '').slice(5, 10));
   const hr = cnt(R, r => (r['접수시각'] || '').slice(11, 13) + '시');
   let h = `<div class="stat"><div><b>${R.length}</b>전체</div><div><b>${st['접수'] || 0}</b>접수</div><div><b>${st['처리중'] || 0}</b>처리중</div>
-    <div><b>${st['종결'] || 0}</b>종결</div><div><b style="color:#ff6b6b">${rk['고'] || 0}</b>고위험</div><div><b style="color:#ffb020">${over}</b>재확인 지남</div></div>
+    <div><b>${st['종결'] || 0}</b>종결</div><div><b style="color:#ff6b6b">${rk['고'] || 0}</b>고위험</div><div><b style="color:#ff6b6b">${over}</b>재확인 지남</div></div>
     <button class="btn full" onclick="dlXlsx()">📥 엑셀 받기 (탭 4개)</button><div class="bars">`;
   h += bars('위험도별', rk, ['고','중','저']);
   h += bars('날짜별 (행사 11. 18.~21.)', day, ev.concat(Object.keys(day).filter(k => !ev.includes(k)).sort()));
