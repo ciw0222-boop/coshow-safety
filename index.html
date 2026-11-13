@@ -4,61 +4,99 @@
 <base target="_top">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1020">
 <title>제3회 CO-SHOW 안전상황실</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Pretendard,'Malgun Gothic',sans-serif;background:#0b1220;color:#e7ecf5;font-size:16px}
-header{position:sticky;top:0;z-index:5;background:#0f1a30;border-bottom:1px solid #22304d;padding:12px 14px}
-header h1{margin:0;font-size:17px}
-header small{color:#8fa0bf}
-nav{display:flex;gap:6px;margin-top:10px}
-nav button{flex:1;padding:9px 0;border:0;border-radius:10px;background:#18243f;color:#b9c6de;font-size:14px;font-weight:600}
-nav button.on{background:#e8493f;color:#fff}
-main{padding:12px 12px 90px;max-width:720px;margin:0 auto}
-.card{background:#121c33;border:1px solid #22304d;border-radius:14px;padding:12px;margin-bottom:10px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.chip{font-size:12px;padding:3px 8px;border-radius:99px;background:#22304d;color:#c9d4ea;white-space:nowrap}
-.r-고{background:#e8493f;color:#fff}.r-중{background:#f2a33a;color:#1b1300}.r-저{background:#2f8f5b;color:#fff}
-.s-접수{background:#3b5bdb;color:#fff}.s-처리중{background:#f2a33a;color:#1b1300}.s-종결{background:#3a4560;color:#c9d4ea}
-.muted{color:#8fa0bf;font-size:13px}
-.txt{white-space:pre-wrap;margin:8px 0 2px;line-height:1.45}
-label{display:block;font-size:13px;color:#8fa0bf;margin:10px 0 4px}
-input,select,textarea{width:100%;padding:11px;border-radius:10px;border:1px solid #2b3a5c;background:#0b1428;color:#e7ecf5;font-size:16px;font-family:inherit}
-textarea{min-height:90px}
-.btn{display:inline-block;padding:12px 14px;border-radius:12px;border:0;background:#e8493f;color:#fff;font-weight:700;font-size:15px;text-decoration:none;text-align:center}
-.btn.gray{background:#22304d;color:#dfe6f3}.btn.full{width:100%}
-.seg{display:flex;gap:6px}.seg button{flex:1;padding:10px 0;border-radius:10px;border:1px solid #2b3a5c;background:#0b1428;color:#c9d4ea;font-size:15px}
-.seg button.on{border-color:#e8493f;background:#3a1416;color:#fff;font-weight:700}
-.fab{position:fixed;right:16px;bottom:18px;z-index:6;border-radius:99px;padding:15px 20px;box-shadow:0 6px 20px rgba(0,0,0,.45)}
-.filters{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
-.filters button{padding:7px 12px;border-radius:99px;border:1px solid #2b3a5c;background:transparent;color:#b9c6de;font-size:13px;white-space:nowrap}
-.filters button.on{background:#e7ecf5;color:#0b1220}
-.call{display:flex;gap:6px;margin-top:8px}.call a{flex:1;font-size:14px;padding:10px}
-.log{font-size:12px;color:#8fa0bf;white-space:pre-wrap;border-top:1px dashed #2b3a5c;margin-top:8px;padding-top:6px}
-.now{border-color:#e8493f}
-.date{font-weight:700;margin:14px 2px 6px;color:#ffd4d1}
-#login{max-width:360px;margin:16vh auto;padding:0 16px;text-align:center}
-#login h2{margin:0 0 6px}
-.sheet{position:fixed;inset:0;background:rgba(5,9,18,.7);z-index:10;display:none;align-items:flex-end;justify-content:center}
-.sheet .box{background:#0f1a30;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px 24px}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e7ecf5;color:#0b1220;padding:10px 16px;border-radius:99px;font-weight:700;display:none;z-index:20}
-.over{color:#ff8f87;font-weight:700}
-.thumbs a{color:#8cb4ff;font-size:13px;margin-right:8px}
-.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}
-.stat div{background:#121c33;border:1px solid #22304d;border-radius:12px;padding:10px;text-align:center;font-size:13px;color:#b9c6de}
-.stat b{display:block;font-size:24px;color:#e7ecf5}
-.bars h3{font-size:14px;margin:18px 0 6px;color:#ffd4d1}
-.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+:root{--bg:#0a1020;--panel:#131c31;--panel2:#18233c;--line:#26344f;--text:#eef2f9;--mute:#a1aec6;--accent:#ff5a4e;--hi:#ff5a4e;--mid:#ffab2e;--lo:#34c98a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:Pretendard,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.5;letter-spacing:-.01em}
+header{position:sticky;top:0;z-index:5;background:rgba(10,16,32,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px 8px}
+header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em}
+header small{display:flex;align-items:center;gap:6px;margin-top:2px;color:var(--mute);font-size:13px}
+header small::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--lo);box-shadow:0 0 0 3px rgba(52,201,138,.2)}
+nav{display:flex;gap:4px;margin-top:10px}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 6px;border:0;border-radius:12px;background:transparent;color:var(--mute);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer}
+nav button i{font-style:normal;font-size:19px;line-height:1}
+nav button.on{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(255,90,78,.35)}
+main{padding:14px 14px 104px;max-width:720px;margin:0 auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 14px 13px;margin-bottom:10px}
+.card.rec{border-left:5px solid #3a4560;cursor:pointer}
+.card.rec.k-고{border-left-color:var(--hi);background:linear-gradient(90deg,rgba(255,90,78,.09),var(--panel) 45%)}
+.card.rec.k-중{border-left-color:var(--mid)}
+.card.rec.k-저{border-left-color:var(--lo)}
+.card.rec.done{opacity:.62}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:#22304d;color:#d3dcee;white-space:nowrap}
+.r-고{background:var(--hi);color:#fff}.r-중{background:var(--mid);color:#2a1a00}.r-저{background:var(--lo);color:#03200f}
+.s-접수{background:#4c6ef5;color:#fff}.s-처리중{background:#ffd43b;color:#2a2000}.s-종결{background:#2c3650;color:#b3bfd4}
+.place{margin-left:auto;color:var(--mute);font-size:13px;font-weight:600}
+.muted{color:var(--mute);font-size:13px}
+.txt{white-space:pre-wrap;margin:10px 0 8px;font-size:16.5px;font-weight:600;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:2px 12px;color:var(--mute);font-size:13px}
+.who{font-size:17px;font-weight:800}
+.role{color:var(--mute);font-size:13.5px;margin-top:2px;word-break:keep-all}
+.tel{font-size:15px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums}
+.mail{color:#8fb3ff;font-size:13px;margin-top:2px;overflow-wrap:anywhere}
+.info{color:var(--mute);font-size:13.5px;margin-top:3px}
+label{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:14px 0 6px}
+input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:var(--text);font-size:16px;font-family:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,90,78,.18)}
+textarea{min-height:96px;line-height:1.5}
+.btn{display:inline-block;padding:13px 14px;border-radius:12px;border:0;background:var(--accent);color:#fff;font-weight:800;font-size:15px;font-family:inherit;text-decoration:none;text-align:center;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.6}
+.btn.gray{background:var(--panel2);color:#e3e9f5;border:1px solid #2e3e62}
+.btn.full{width:100%}
+.btn.danger{background:transparent;color:#ff8f87;border:1px solid rgba(255,90,78,.45)}
+.seg{display:flex;gap:6px}.seg button{flex:1;padding:11px 0;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:#c9d4ea;font-size:15px;font-weight:600;font-family:inherit}
+.seg button.on{border-color:var(--accent);background:rgba(255,90,78,.16);color:#fff;font-weight:800}
+.fab{position:fixed;right:16px;bottom:20px;z-index:6;border-radius:99px;padding:15px 22px;font-size:16px;box-shadow:0 8px 24px rgba(255,90,78,.45)}
+.filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.filters button{padding:8px 14px;border-radius:99px;border:1px solid #2e3e62;background:transparent;color:#c3cee3;font-size:14px;font-weight:600;font-family:inherit;white-space:nowrap}
+.filters button b{margin-left:4px;color:var(--mute);font-weight:700}
+.filters button.on{background:var(--text);border-color:var(--text);color:#0a1020}
+.filters button.on b{color:#4a5670}
+.call{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.call a{flex:1 1 40%;font-size:14.5px;padding:11px 8px}
+.log{font-size:12.5px;color:var(--mute);white-space:pre-wrap;border-top:1px dashed #2e3e62;margin-top:14px;padding-top:10px;line-height:1.6}
+.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.date{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;margin:22px 2px 10px;color:#ffc9c4}
+.date:first-child{margin-top:4px}
+.date::after{content:'';flex:1;height:1px;background:var(--line)}
+.date span{color:var(--mute);font-weight:600;font-size:12.5px}
+.empty{text-align:center;padding:40px 10px;color:var(--mute)}
+.empty i{display:block;font-style:normal;font-size:34px;margin-bottom:6px}
+.sos{background:linear-gradient(135deg,#ff5a4e,#c42d27);border:0;color:#fff}
+.sos .who{font-size:19px}
+.sos .btn{background:#fff;color:#c42d27}
+#login{max-width:380px;margin:12vh auto;padding:0 18px}
+#login .box{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px 20px 20px;text-align:center}
+#login .logo{width:62px;height:62px;margin:0 auto 10px;border-radius:18px;background:linear-gradient(135deg,#ff5a4e,#c42d27);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 24px rgba(255,90,78,.35)}
+#login h2{margin:0;font-size:22px;font-weight:800}
+#login label{text-align:left}
+.sheet{position:fixed;inset:0;background:rgba(4,8,18,.72);z-index:10;display:none;align-items:flex-end;justify-content:center}
+.sheet .box{background:#0f182c;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:8px 16px 26px;border-top:1px solid var(--line)}
+.sheet .box::before{content:'';display:block;width:42px;height:5px;border-radius:9px;background:#33425f;margin:4px auto 12px}
+.sheet h3{font-size:19px;font-weight:800}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--text);color:#0a1020;padding:11px 18px;border-radius:99px;font-weight:800;display:none;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.over{color:#ff8f87;font-weight:800}
+.thumbs a{color:#8fb3ff;font-size:14px;margin-right:10px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.stat div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;font-size:12.5px;font-weight:600;color:var(--mute)}
+.stat b{display:block;font-size:26px;font-weight:800;color:var(--text);line-height:1.2}
+.bars{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:4px 14px 12px;margin-top:12px}
+.bars h3{font-size:14px;font-weight:800;margin:16px 0 8px;color:#ffc9c4}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
 .bar span{width:110px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar i{display:block;height:14px;background:#e8493f;border-radius:4px;min-width:2px}
-.bar em{font-style:normal;color:#b9c6de}
+.bar i{display:block;height:12px;background:linear-gradient(90deg,#ff5a4e,#ff8a5c);border-radius:6px;min-width:3px}
+.bar em{font-style:normal;color:var(--mute);font-weight:700}
 </style>
 </head>
 <body>
-<div id="login">
-  <h2>🛟 안전상황실</h2>
-  <p class="muted" id="evName">제3회 CO-SHOW</p>
+<div id="login"><div class="box">
+  <div class="logo">⛑️</div>
+  <h2>안전상황실</h2>
+  <p class="muted" id="evName" style="margin:4px 0 8px">제3회 CO-SHOW · 김대중컨벤션센터</p>
   <label>입장 비밀번호</label>
   <input id="pw" type="password" inputmode="numeric" autocomplete="off">
   <label>내 이름 (기록자로 남아요)</label>
@@ -66,18 +104,18 @@ textarea{min-height:90px}
   <p></p>
   <button class="btn full" onclick="doLogin()">입장</button>
   <p class="muted" id="loginMsg"></p>
-</div>
+</div></div>
 
 <div id="app" style="display:none">
 <header>
-  <h1 id="title">🛟 안전상황실</h1>
+  <h1 id="title">⛑️ 안전상황실</h1>
   <small id="sub"></small>
   <nav>
-    <button data-t="rec" class="on" onclick="tab('rec')">상황기록</button>
-    <button data-t="con" onclick="tab('con')">연락망</button>
-    <button data-t="duty" onclick="tab('duty')">근무표</button>
-    <button data-t="med" onclick="tab('med')">의료</button>
-    <button data-t="adm" id="admTab" style="display:none" onclick="tab('adm')">📊 관리</button>
+    <button data-t="rec" class="on" onclick="tab('rec')"><i>🚨</i>상황기록</button>
+    <button data-t="con" onclick="tab('con')"><i>📞</i>연락망</button>
+    <button data-t="duty" onclick="tab('duty')"><i>🕒</i>근무표</button>
+    <button data-t="med" onclick="tab('med')"><i>🏥</i>의료</button>
+    <button data-t="adm" id="admTab" style="display:none" onclick="tab('adm')"><i>📊</i>관리</button>
   </nav>
 </header>
 <main id="main"></main>
@@ -112,7 +150,7 @@ async function doLogin(auto){
     D = await run('loadAll', pw);
     PW = pw; ME = me || ME; LS.set('sr_pw', PW); LS.set('sr_me', ME);
     $('#login').style.display = 'none'; $('#app').style.display = 'block';
-    $('#title').textContent = '🛟 ' + D.event + ' 안전상황실';
+    $('#title').textContent = '⛑️ ' + D.event + ' 안전상황실';
     $('#admTab').style.display = D.admin ? '' : 'none';
     render(); setInterval(refresh, 30000);
   } catch (e) {
@@ -177,15 +215,16 @@ async function dlXlsx(){
 function renderRec(){
   const f = {진행:r=>r['상태']!=='종결', 고위험:r=>r['위험도']==='고', 종결:r=>r['상태']==='종결', 전체:()=>true}[FIL];
   const list = D.rec.filter(f);
-  let h = '<div class="filters">' + ['진행','고위험','종결','전체'].map(k=>`<button class="${k===FIL?'on':''}" onclick="FIL='${k}';render()">${k}</button>`).join('') + '</div>';
-  if (!list.length) h += '<p class="muted">기록이 없어요.</p>';
+  const fs = {진행:r=>r['상태']!=='종결', 고위험:r=>r['위험도']==='고', 종결:r=>r['상태']==='종결', 전체:()=>true};
+  let h = '<div class="filters">' + Object.keys(fs).map(k=>`<button class="${k===FIL?'on':''}" onclick="FIL='${k}';render()">${k}<b>${D.rec.filter(fs[k]).length}</b></button>`).join('') + '</div>';
+  if (!list.length) h += '<div class="empty"><i>✅</i>기록이 없어요</div>';
   const nowT = new Date(D.now.replace(' ','T')+':00');
   list.forEach(r=>{
     const re = r['재확인시각']; const over = re && r['상태']!=='종결' && new Date(re.replace(' ','T')+':00') <= nowT;
-    h += `<div class="card" onclick="openRec('${esc(r['ID'])}')">
-      <div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span><span class="chip s-${esc(r['상태'])}">${esc(r['상태'])}</span><span class="chip">${esc(r['분류'])}</span><span class="muted">${esc(r['장소'])}</span></div>
+    h += `<div class="card rec k-${esc(r['위험도'])} ${r['상태']==='종결'?'done':''}" onclick="openRec('${esc(r['ID'])}')">
+      <div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span><span class="chip s-${esc(r['상태'])}">${esc(r['상태'])}</span>${r['분류']?`<span class="chip">${esc(r['분류'])}</span>`:''}${r['장소']?`<span class="place">📍 ${esc(r['장소'])}</span>`:''}</div>
       <div class="txt">${esc(r['내용'])}</div>
-      <div class="muted">${esc(r['접수시각'])} · ${esc(r['기록자'])}${re?` · <span class="${over?'over':''}">⏰ 재확인 ${esc(re)}${over?' 지남':''}</span>`:''}${r['사진']?' · 📷':''}</div>
+      <div class="meta"><span>🕒 ${esc(r['접수시각'])}</span><span>✍️ ${esc(r['기록자'])}</span>${re?`<span class="${over?'over':''}">⏰ 재확인 ${esc(re)}${over?' 지남':''}</span>`:''}${r['사진']?'<span>📷 사진</span>':''}</div>
     </div>`;
   });
   $('#main').innerHTML = h;
@@ -195,29 +234,31 @@ function renderRec(){
 function callBtns(p){ const ns = String(p || '').split(/[,\/·]/).map(telOf).filter(Boolean); return ns.length ? `<div class="call">${ns.map(t => `<a class="btn gray" href="tel:${t}">📞 ${ns.length > 1 ? t : '전화'}</a>` + (/^01/.test(t) ? `<a class="btn gray" href="sms:${t}">💬 문자</a>` : '')).join('')}</div>` : ''; }
 
 function renderCon(){
-  if (!D.con.length) { $('#main').innerHTML = '<p class="muted">연락망이 비어 있어요. 구글 시트 「연락망」 탭에 적으면 여기에 떠요.</p>'; return; }
+  if (!D.con.length) { $('#main').innerHTML = '<div class="empty"><i>📞</i>연락망이 비어 있어요<br>구글 시트 「연락망」 탭에 적으면 여기에 떠요</div>'; return; }
   let h = '', g = '';
-  D.con.forEach(c=>{ if (c['구분']!==g){ g=c['구분']; h+=`<div class="date">${esc(g||'기타')}</div>`; }
-    h += `<div class="card"><div class="row"><b>${esc(c['이름'])}</b><span class="chip">${esc(c['역할'])}</span></div><div class="muted">${esc(c['전화'])} ${esc(c['비고'])}</div>${callBtns(c['전화'])}</div>`; });
+  const n = cnt(D.con, c => c['구분']);
+  D.con.forEach(c=>{ if (c['구분']!==g){ g=c['구분']; h+=`<div class="date">${esc(g||'기타')} <span>${n[g||'(빈칸)']||''}명</span></div>`; }
+    const mail = /@/.test(c['비고']);
+    h += `<div class="card"><div class="who">${esc(c['이름'])}</div><div class="role">${esc(c['역할'])}</div>${c['전화']?`<div class="tel">${esc(c['전화'])}</div>`:''}${c['비고']?`<div class="${mail?'mail':'info'}">${mail?'✉️ ':''}${esc(c['비고'])}</div>`:''}${callBtns(c['전화'])}</div>`; });
   $('#main').innerHTML = h;
 }
 
 function renderDuty(){
-  if (!D.duty.length) { $('#main').innerHTML = '<p class="muted">근무표가 비어 있어요. 구글 시트 「근무표」 탭에 적으면 여기에 떠요.</p>'; return; }
+  if (!D.duty.length) { $('#main').innerHTML = '<div class="empty"><i>🕒</i>근무표가 비어 있어요<br>구글 시트 「근무표」 탭에 적으면 여기에 떠요</div>'; return; }
   const [today, nowHM] = D.now.split(' ');
   let h = '', g = '';
   D.duty.forEach(d=>{ if (d['날짜']!==g){ g=d['날짜']; h+=`<div class="date">${esc(g)}</div>`; }
     const on = d['날짜']===today && d['시작']<=nowHM && nowHM<d['끝'];
-    h += `<div class="card ${on?'now':''}"><div class="row"><b>${esc(d['시작'])}~${esc(d['끝'])}</b><span class="chip">${esc(d['위치'])}</span>${on?'<span class="chip r-고">지금 근무</span>':''}</div><div>${esc(d['이름'])} <span class="muted">${esc(d['역할'])}</span></div>${callBtns(d['전화'])}</div>`; });
+    h += `<div class="card ${on?'now':''}"><div class="row"><b>${esc(d['시작'])}~${esc(d['끝'])}</b><span class="chip">${esc(d['위치'])}</span>${on?'<span class="chip r-고">지금 근무</span>':''}</div><div class="who" style="margin-top:8px">${esc(d['이름'])}</div><div class="role">${esc(d['역할'])}</div>${callBtns(d['전화'])}</div>`; });
   $('#main').innerHTML = h;
 }
 
 function renderMed(){
-  let h = '<div class="card"><b>🚨 응급 119</b><div class="call"><a class="btn" href="tel:119">📞 119</a></div></div>';
-  if (!D.med.length) h += '<p class="muted">의료 목록이 비어 있어요. 구글 시트 「의료」 탭에 적으면 여기에 떠요.</p>';
+  let h = '<div class="card sos"><div class="who">🚨 응급 상황은 바로 119</div><div class="call"><a class="btn" href="tel:119">📞 119 전화</a></div></div>';
+  if (!D.med.length) h += '<div class="empty"><i>🏥</i>의료 목록이 비어 있어요</div>';
   let g = '';
   D.med.forEach(m=>{ if (m['구분']!==g){ g=m['구분']; h+=`<div class="date">${esc(g)}</div>`; }
-    h += `<div class="card"><b>${esc(m['이름'])}</b> <span class="muted">${esc(m['거리'])}</span><div class="muted">${esc(m['주소'])}</div><div class="muted">${esc(m['운영'])}</div>
+    h += `<div class="card"><div class="row"><span class="who">${esc(m['이름'])}</span>${m['거리']?`<span class="chip">${esc(m['거리'])}</span>`:''}</div>${m['주소']?`<div class="info">📍 ${esc(m['주소'])}</div>`:''}${m['운영']?`<div class="info">🕘 ${esc(m['운영'])}</div>`:''}
       <div class="call">${telOf(m['전화'])?`<a class="btn gray" href="tel:${telOf(m['전화'])}">📞 ${esc(m['전화'])}</a>`:''}<a class="btn gray" href="https:\/\/map.kakao.com/?q=${encodeURIComponent(m['주소']||m['이름'])}">🗺 지도</a></div></div>`; });
   $('#main').innerHTML = h;
 }
@@ -232,7 +273,7 @@ $('#sheet').addEventListener('click', e=>{ if (e.target.id==='sheet') closeSheet
 
 function openNew(){
   NEWP = [];
-  sheet(`<h3 style="margin:4px 0">새 상황 기록</h3>
+  sheet(`<h3 style="margin:2px 0 4px">🚨 새 상황 기록</h3>
     <label>위험도</label>${seg('risk',['고','중','저'],'저')}
     <label>분류</label><select id="f_cat">${opts(D.cats,'')}</select>
     <label>장소</label><input id="f_place" list="plist" placeholder="예: 전시홀 B 입구"><datalist id="plist">${D.places.map(p=>`<option value="${esc(p)}">`).join('')}</datalist>
@@ -279,7 +320,7 @@ function openRec(id){
     <label>사진</label><div class="thumbs">${photos||'<span class="muted">없음</span>'}</div>\x3cinput type="file" accept="image/\x2a" multiple onchange="addPhotos(this.files)"><div class="muted" id="pinfo"></div>
     <p></p><button class="btn full" id="saveBtn" onclick="saveRec('${esc(r['ID'])}')">저장</button>
     <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>
-    ${D.admin ? `<p></p><button class="btn gray full" id="delBtn" style="color:#ff8f87" onclick="delRec('${esc(r['ID'])}')">🗑 이 기록 삭제 (관리자)</button>` : ''}
+    ${D.admin ? `<p></p><button class="btn danger full" id="delBtn" onclick="delRec('${esc(r['ID'])}')">🗑 이 기록 삭제 (관리자)</button>` : ''}
     <div class="log">${esc(r['처리이력'])}</div>`);
 }
 
