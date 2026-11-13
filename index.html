@@ -256,6 +256,14 @@ async function saveNew(){
   catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='기록 남기기'; }
 }
 
+// 관리자 삭제: 실수 방지로 두 번 눌러야 지워짐. 지운 기록은 시트 「삭제기록」 탭에 남음
+async function delRec(id){
+  const b = $('#delBtn');
+  if (!b.dataset.ok) { b.dataset.ok = '1'; b.textContent = '⚠️ 한 번 더 누르면 삭제돼요'; setTimeout(() => { if (b.isConnected) { b.dataset.ok = ''; b.textContent = '🗑 이 기록 삭제 (관리자)'; } }, 4000); return; }
+  b.disabled = true; b.textContent = '지우는 중…';
+  try { await run('delRec', PW, id, ME); toast('🗑 삭제됨'); D = await run('loadAll', PW); closeSheet(); }
+  catch (e) { toast('❌ ' + (e.message || e)); b.disabled = false; b.dataset.ok = ''; b.textContent = '🗑 이 기록 삭제 (관리자)'; }
+}
 function openRec(id){
   const r = D.rec.find(x=>x['ID']===id); if (!r) return; NEWP = [];
   const photos = (r['사진']||'').split('\n').filter(Boolean).map((u,i)=>`<a href="${esc(u)}" target="_blank">📷 사진 ${i+1}</a>`).join('');
@@ -271,6 +279,7 @@ function openRec(id){
     <label>사진</label><div class="thumbs">${photos||'<span class="muted">없음</span>'}</div>\x3cinput type="file" accept="image/\x2a" multiple onchange="addPhotos(this.files)"><div class="muted" id="pinfo"></div>
     <p></p><button class="btn full" id="saveBtn" onclick="saveRec('${esc(r['ID'])}')">저장</button>
     <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>
+    ${D.admin ? `<p></p><button class="btn gray full" id="delBtn" style="color:#ff8f87" onclick="delRec('${esc(r['ID'])}')">🗑 이 기록 삭제 (관리자)</button>` : ''}
     <div class="log">${esc(r['처리이력'])}</div>`);
 }
 
