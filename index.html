@@ -29,7 +29,7 @@ main{padding:14px 14px 104px;max-width:720px;margin:0 auto}
 .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .chip{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:#22304d;color:#d3dcee;white-space:nowrap}
 .r-고{background:var(--hi);color:#fff}.r-중{background:var(--mid);color:#2a1a00}.r-저{background:var(--lo);color:#03200f}
-.s-접수{background:#4c6ef5;color:#fff}.s-처리중{background:#ffd43b;color:#2a2000}.s-종결{background:#2c3650;color:#b3bfd4}
+.s-접수{background:#4c6ef5;color:#fff}.s-처리중{background:#ffd43b;color:#2a2000}.s-완료{background:#1f9d68;color:#fff}
 .place{margin-left:auto;color:var(--mute);font-size:13px;font-weight:600}
 .muted{color:var(--mute);font-size:13px}
 .txt{white-space:pre-wrap;margin:10px 0 8px;font-size:16.5px;font-weight:600;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
@@ -114,6 +114,23 @@ textarea{min-height:96px;line-height:1.5}
 #login input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.2)}
 #login .btn{background:linear-gradient(135deg,#2f6bff,#16b8e0);box-shadow:0 6px 18px rgba(40,130,255,.32)}
 #login .muted{color:#aebde6}
+.stbtn{display:flex;gap:6px;margin-top:10px}
+.stbtn button{flex:1;padding:9px 0;border-radius:10px;border:1px solid #2e3e62;background:#0c1428;color:#c3cee3;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
+.stbtn button.on{border-color:transparent}
+main.wide{max-width:1280px}
+.bsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.bsum div{border-radius:14px;padding:10px 6px;text-align:center;font-size:13px;font-weight:700}
+.bsum b{display:block;font-size:26px;font-weight:800;line-height:1.2}
+.board{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:900px){.board{grid-template-columns:repeat(3,1fr);align-items:start}}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px}
+.col h3{display:flex;align-items:center;gap:8px;margin:2px 4px 10px;font-size:15px;font-weight:800}
+.col h3 span{margin-left:auto;color:var(--mute);font-size:13px}
+.mini{background:#0f182c;border:1px solid var(--line);border-left:4px solid #3a4560;border-radius:12px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+.mini.k-고{border-left-color:var(--hi)}.mini.k-중{border-left-color:var(--mid)}.mini.k-저{border-left-color:var(--lo)}
+.mini .txt{margin:6px 0 4px;font-size:15px}
+.done-info{margin-top:6px;padding:7px 9px;border-radius:9px;background:rgba(31,157,104,.14);color:#b9f0d6;font-size:13px}
+.stbtn button.on.s-접수{background:#4c6ef5;color:#fff}.stbtn button.on.s-처리중{background:#ffd43b;color:#1a1a1a}.stbtn button.on.s-완료{background:#1f9d68;color:#fff}
 </style>
 </head>
 <body>
@@ -135,6 +152,7 @@ textarea{min-height:96px;line-height:1.5}
   <small id="sub"></small>
   <nav>
     <button data-t="rec" class="on" onclick="tab('rec')"><i>🚨</i>상황기록</button>
+    <button data-t="board" onclick="tab('board')"><i>📋</i>상황판</button>
     <button data-t="con" onclick="tab('con')"><i>📞</i>연락망</button>
     <button data-t="duty" onclick="tab('duty')"><i>🕒</i>근무표</button>
     <button data-t="med" onclick="tab('med')"><i>🏥</i>의료</button>
@@ -157,6 +175,13 @@ let PW = LS.get('sr_pw'), ME = LS.get('sr_me');
 let D = null, CUR = 'rec', FIL = '진행', NEWP = [], CONG = '전체', CONQ = '', CONO = -1;
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// 시트가 시각을 「2026-11-13 5:04」처럼 바꿔도 읽게
+function TT(s){ const m = String(s || '').match(/(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})/); return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]) : null; }
+const p2 = n => String(n).padStart(2, '0');
+function L(s){ const d = TT(s); return d ? `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}` : ''; }
+function nowL(){ const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}T${p2(d.getHours())}:${p2(d.getMinutes())}`; }
+// 예전 「종결」 기록도 「완료」로 보이게
+function norm(d){ (d.rec || []).forEach(r => { if (r['상태'] === '종' + '결') r['상태'] = '완료'; }); return d; }
 const telOf = s => String(s || '').replace(/[^0-9+]/g, '');
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',1600)}
 const API = 'https://script.google.com/macros/s/AKfycbzy0KeI4pqpqpHw1bkyZqRV_NYLGzyb-Jt48OZwtBBW4PhRfdabp1wWDX8sGkwi5Rvk/exec';
@@ -170,7 +195,7 @@ async function doLogin(auto){
   if (!me && !auto) { $('#loginMsg').textContent = '이름을 적어 주세요'; return; }
   $('#loginMsg').textContent = '확인 중…';
   try {
-    D = await run('loadAll', pw);
+    D = norm(await run('loadAll', pw));
     PW = pw; ME = me || ME; LS.set('sr_pw', PW); LS.set('sr_me', ME);
     $('#login').style.display = 'none'; $('#app').style.display = 'block';
     $('#title').textContent = '⛑️ ' + D.event + ' 안전상황실';
@@ -181,14 +206,14 @@ async function doLogin(auto){
     $('#loginMsg').textContent = auto ? '' : '❌ ' + (e.message || e);
   }
 }
-async function refresh(){ try { D = await run('loadAll', PW); if (!$('#sheet').style.display || $('#sheet').style.display==='none') render(); } catch(e){} }
+async function refresh(){ try { D = norm(await run('loadAll', PW)); if (!$('#sheet').style.display || $('#sheet').style.display==='none') render(); } catch(e){} }
 
-function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#fab').style.display=t==='rec'?'block':'none';render()}
+function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#fab').style.display=t==='rec'?'block':'none';$('#main').classList.toggle('wide',t==='board');render()}
 
 function render(){
-  const open = D.rec.filter(r=>r['상태']!=='종결').length;
+  const open = D.rec.filter(r=>r['상태']!=='완료').length;
   $('#sub').textContent = (ME?ME+' · ':'') + '진행 중 ' + open + '건 · ' + D.now + ' 기준';
-  ({rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed,adm:renderAdm})[CUR]();
+  ({board:renderBoard,rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed,adm:renderAdm})[CUR]();
 }
 
 // ── 관리 화면: 관리자 비밀번호로 들어온 사람만 탭이 보임
@@ -199,14 +224,14 @@ function bars(title, m, order){
   return `<h3>${title}</h3>` + (ks.length ? ks.map(k => `<div class="bar"><span>${esc(k)}</span><i style="width:${Math.round((m[k] || 0) / mx * 55)}%"></i><em>${m[k] || 0}</em></div>`).join('') : '<p class="muted">없음</p>');
 }
 function renderAdm(){
-  const R = D.rec, nowT = new Date(D.now.replace(' ','T')+':00');
+  const R = D.rec, nowT = TT(D.now);
   const st = cnt(R, r => r['상태']), rk = cnt(R, r => r['위험도']);
-  const over = R.filter(r => r['재확인시각'] && r['상태'] !== '종결' && new Date(r['재확인시각'].replace(' ','T')+':00') <= nowT).length;
+  const over = R.filter(r => r['재확인시각'] && r['상태'] !== '완료' && (TT(r['재확인시각'])||9e15) <= nowT).length;
   const ev = ['11-18','11-19','11-20','11-21'];
   const day = cnt(R, r => (r['접수시각'] || '').slice(5, 10));
   const hr = cnt(R, r => (r['접수시각'] || '').slice(11, 13) + '시');
   let h = `<div class="stat"><div><b>${R.length}</b>전체</div><div><b>${st['접수'] || 0}</b>접수</div><div><b>${st['처리중'] || 0}</b>처리중</div>
-    <div><b>${st['종결'] || 0}</b>종결</div><div><b style="color:#ff6b6b">${rk['고'] || 0}</b>고위험</div><div><b style="color:#ff6b6b">${over}</b>재확인 지남</div></div>
+    <div><b>${st['완료'] || 0}</b>완료</div><div><b style="color:#ff6b6b">${rk['고'] || 0}</b>고위험</div><div><b style="color:#ff6b6b">${over}</b>재확인 지남</div></div>
     <button class="btn full" onclick="dlXlsx()">📥 엑셀 받기 (탭 4개)</button><div class="bars">`;
   h += bars('위험도별', rk, ['고','중','저']);
   h += bars('날짜별 (행사 11. 18.~21.)', day, ev.concat(Object.keys(day).filter(k => !ev.includes(k)).sort()));
@@ -220,7 +245,7 @@ function loadXlsxLib(){ return window.XLSX ? Promise.resolve() : new Promise((ok
 async function dlXlsx(){
   try {
     toast('엑셀 만드는 중…'); await loadXlsxLib();
-    const H = { 상황기록: ['ID','접수시각','기록자','장소','분류','위험도','상태','내용','조치','후속조치','재확인시각','사진','수정시각','처리이력'],
+    const H = { 상황기록: ['ID','접수시각','기록자','장소','분류','위험도','상태','내용','조치','후속조치','재확인시각','완료시각','사진','수정시각','처리이력'],
       연락망: ['구분','이름','역할','전화','비고'], 근무표: ['날짜','시작','끝','위치','이름','역할','전화'], 의료: ['구분','이름','주소','전화','운영','거리','출처'] };
     const src = { 상황기록: D.rec.slice().reverse(), 연락망: D.con, 근무표: D.duty, 의료: D.med };
     const wide = ['내용','조치','후속조치','처리이력','주소','운영','출처','사진'];
@@ -235,19 +260,68 @@ async function dlXlsx(){
   } catch (e) { toast('❌ ' + (e.message || e)); }
 }
 
+// 상태 바로 바꾸기: 완료는 완료 시각·조치사항 창을 띄움
+async function setSt(id, s){
+  const r = D.rec.find(x => x['ID'] === id); if (!r || r['상태'] === s) return;
+  if (s === '완료') return openDone(id);
+  try { toast('바꾸는 중…'); await run('updRec', PW, id, { by: ME, '상태': s, '완료시각': '' }); D = norm(await run('loadAll', PW)); render(); toast('✅ ' + s); }
+  catch (e) { toast('❌ 저장 실패'); }
+}
+function openDone(id){
+  const r = D.rec.find(x => x['ID'] === id); if (!r) return;
+  sheet(`<h3 style="margin:2px 0 4px">✅ 완료 처리</h3>
+    <div class="card" style="margin:8px 0 0"><div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span><span class="muted">${esc(r['장소'])}</span></div><div class="txt">${esc(r['내용'])}</div></div>
+    <label>완료 시각</label><input id="d_at" type="datetime-local" value="${nowL()}">
+    <label>조치사항</label><textarea id="d_act" style="min-height:80px" placeholder="예: 의무실 응급처치 후 귀가">${esc(r['조치'])}</textarea>
+    <p></p><button class="btn full" id="saveBtn" onclick="saveDone('${esc(id)}')">완료 저장</button>
+    <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>`);
+}
+async function saveDone(id){
+  const at = dt($('#d_at').value); if (!at) { toast('완료 시각을 넣어 주세요'); return; }
+  $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
+  try { await run('updRec', PW, id, { by: ME, '상태': '완료', '완료시각': at, '조치': $('#d_act').value.trim() }); toast('✅ 완료'); D = norm(await run('loadAll', PW)); closeSheet(); }
+  catch (e) { toast('❌ 저장 실패'); $('#saveBtn').disabled = false; $('#saveBtn').textContent = '완료 저장'; }
+}
+// 상황판: 접수 · 처리중 · 완료 세 칸
+function renderBoard(){
+  const C = { 접수: [], 처리중: [], 완료: [] };
+  D.rec.forEach(r => (C[r['상태']] || C['접수']).push(r));
+  C['완료'].sort((a, b) => String(b['완료시각']).localeCompare(String(a['완료시각'])));
+  const nowT = TT(D.now);
+  const col = { 접수: '#4c6ef5', 처리중: '#ffd43b', 완료: '#1f9d68' };
+  let h = '<div class="bsum">' + Object.keys(C).map(k => `<div class="s-${k}"><b>${C[k].length}</b>${k}</div>`).join('') + '</div><div class="board">';
+  Object.keys(C).forEach(k => {
+    h += `<div class="col"><h3><i style="width:10px;height:10px;border-radius:50%;background:${col[k]};display:inline-block"></i>${k}<span>${C[k].length}건</span></h3>`;
+    if (!C[k].length) h += '<p class="muted" style="margin:6px 4px 10px">없음</p>';
+    C[k].forEach(r => {
+      const re = r['재확인시각'], over = re && k !== '완료' && (TT(re)||9e15) <= nowT;
+      h += `<div class="mini k-${esc(r['위험도'])}" onclick="openRec('${esc(r['ID'])}')">
+        <div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span>${r['분류']?`<span class="chip">${esc(r['분류'])}</span>`:''}</div>
+        <div class="txt">${esc(r['내용'])}</div>
+        <div class="meta">${r['장소']?`<span>📍 ${esc(r['장소'])}</span>`:''}<span>🕒 ${esc(r['접수시각'])}</span>${over?`<span class="over">⏰ 재확인 지남</span>`:''}</div>
+        ${k === '완료' ? `<div class="done-info">✅ 완료 ${esc(r['완료시각']||'')}${r['조치']?`<br>🛠 ${esc(r['조치'])}`:''}</div>` : ''}
+      </div>`;
+    });
+    h += '</div>';
+  });
+  $('#main').innerHTML = h + '</div>';
+}
+
 function renderRec(){
-  const f = {진행:r=>r['상태']!=='종결', 고위험:r=>r['위험도']==='고', 종결:r=>r['상태']==='종결', 전체:()=>true}[FIL];
+  const f = {진행:r=>r['상태']!=='완료', 고위험:r=>r['위험도']==='고', 완료:r=>r['상태']==='완료', 전체:()=>true}[FIL];
   const list = D.rec.filter(f);
-  const fs = {진행:r=>r['상태']!=='종결', 고위험:r=>r['위험도']==='고', 종결:r=>r['상태']==='종결', 전체:()=>true};
+  const fs = {진행:r=>r['상태']!=='완료', 고위험:r=>r['위험도']==='고', 완료:r=>r['상태']==='완료', 전체:()=>true};
   let h = '<div class="filters">' + Object.keys(fs).map(k=>`<button class="${k===FIL?'on':''}" onclick="FIL='${k}';render()">${k}<b>${D.rec.filter(fs[k]).length}</b></button>`).join('') + '</div>';
   if (!list.length) h += '<div class="empty"><i>✅</i>기록이 없어요</div>';
-  const nowT = new Date(D.now.replace(' ','T')+':00');
+  const nowT = TT(D.now);
   list.forEach(r=>{
-    const re = r['재확인시각']; const over = re && r['상태']!=='종결' && new Date(re.replace(' ','T')+':00') <= nowT;
-    h += `<div class="card rec k-${esc(r['위험도'])} ${r['상태']==='종결'?'done':''}" onclick="openRec('${esc(r['ID'])}')">
+    const re = r['재확인시각']; const over = re && r['상태']!=='완료' && (TT(re)||9e15) <= nowT;
+    h += `<div class="card rec k-${esc(r['위험도'])} ${r['상태']==='완료'?'done':''}" onclick="openRec('${esc(r['ID'])}')">
       <div class="row"><span class="chip r-${esc(r['위험도'])}">${esc(r['위험도'])}위험</span><span class="chip s-${esc(r['상태'])}">${esc(r['상태'])}</span>${r['분류']?`<span class="chip">${esc(r['분류'])}</span>`:''}${r['장소']?`<span class="place">📍 ${esc(r['장소'])}</span>`:''}</div>
       <div class="txt">${esc(r['내용'])}</div>
       <div class="meta"><span>🕒 ${esc(r['접수시각'])}</span><span>✍️ ${esc(r['기록자'])}</span>${re?`<span class="${over?'over':''}">⏰ 재확인 ${esc(re)}${over?' 지남':''}</span>`:''}${r['사진']?'<span>📷 사진</span>':''}</div>
+      ${r['상태']==='완료' ? `<div class="done-info">✅ 완료 ${esc(r['완료시각']||'')}${r['조치']?` · 🛠 ${esc(r['조치'])}`:''}</div>` : ''}
+      <div class="stbtn" onclick="event.stopPropagation()">${['접수','처리중','완료'].map(s=>`<button class="${s===r['상태']?'on s-'+s:''}" onclick="setSt('${esc(r['ID'])}','${s}')">${s}</button>`).join('')}</div>
     </div>`;
   });
   $('#main').innerHTML = h;
@@ -337,7 +411,7 @@ async function saveNew(){
   const r = { by:ME, risk:segVal('risk'), cat:$('#f_cat').value, place:$('#f_place').value.trim(), text:$('#f_text').value.trim(), action:$('#f_action').value.trim(), recheck:dt($('#f_re').value), photos:NEWP };
   if (!r.text) { toast('내용을 적어 주세요'); return; }
   $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
-  try { await run('addRec', PW, r); toast('✅ 기록됨'); D = await run('loadAll', PW); closeSheet(); }
+  try { await run('addRec', PW, r); toast('✅ 기록됨'); D = norm(await run('loadAll', PW)); closeSheet(); }
   catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='기록 남기기'; }
 }
 
@@ -346,21 +420,22 @@ async function delRec(id){
   const b = $('#delBtn');
   if (!b.dataset.ok) { b.dataset.ok = '1'; b.textContent = '⚠️ 한 번 더 누르면 삭제돼요'; setTimeout(() => { if (b.isConnected) { b.dataset.ok = ''; b.textContent = '🗑 이 기록 삭제 (관리자)'; } }, 4000); return; }
   b.disabled = true; b.textContent = '지우는 중…';
-  try { await run('delRec', PW, id, ME); toast('🗑 삭제됨'); D = await run('loadAll', PW); closeSheet(); }
+  try { await run('delRec', PW, id, ME); toast('🗑 삭제됨'); D = norm(await run('loadAll', PW)); closeSheet(); }
   catch (e) { toast('❌ ' + (e.message || e)); b.disabled = false; b.dataset.ok = ''; b.textContent = '🗑 이 기록 삭제 (관리자)'; }
 }
 function openRec(id){
   const r = D.rec.find(x=>x['ID']===id); if (!r) return; NEWP = [];
   const photos = (r['사진']||'').split('\n').filter(Boolean).map((u,i)=>`<a href="${esc(u)}" target="_blank">📷 사진 ${i+1}</a>`).join('');
   sheet(`<div class="row"><span class="chip">${esc(r['ID'])}</span><span class="muted">${esc(r['접수시각'])} · ${esc(r['기록자'])}</span></div>
-    <label>상태</label>${seg('st',['접수','처리중','종결'],r['상태'])}
+    <label>상태</label>${seg('st',['접수','처리중','완료'],r['상태'])}
     <label>위험도</label>${seg('risk',['고','중','저'],r['위험도'])}
     <label>분류</label><select id="e_cat">${opts(D.cats,r['분류'])}</select>
     <label>장소</label><input id="e_place" value="${esc(r['장소'])}">
     <label>내용</label><textarea id="e_text">${esc(r['내용'])}</textarea>
     <label>조치</label><textarea id="e_action" style="min-height:60px">${esc(r['조치'])}</textarea>
     <label>후속조치</label><textarea id="e_follow" style="min-height:60px">${esc(r['후속조치'])}</textarea>
-    <label>재확인 시각</label><input id="e_re" type="datetime-local" value="${esc((r['재확인시각']||'').replace(' ','T'))}">
+    <label>재확인 시각</label><input id="e_re" type="datetime-local" value="${esc(L(r['재확인시각']))}">
+    <label>완료 시각</label><input id="e_done" type="datetime-local" value="${esc(L(r['완료시각']))}">
     <label>사진</label><div class="thumbs">${photos||'<span class="muted">없음</span>'}</div>\x3cinput type="file" accept="image/\x2a" multiple onchange="addPhotos(this.files)"><div class="muted" id="pinfo"></div>
     <p></p><button class="btn full" id="saveBtn" onclick="saveRec('${esc(r['ID'])}')">저장</button>
     <p></p><button class="btn gray full" onclick="closeSheet()">닫기</button>
@@ -369,9 +444,11 @@ function openRec(id){
 }
 
 async function saveRec(id){
-  const u = { by:ME, '상태':segVal('st'), '위험도':segVal('risk'), '분류':$('#e_cat').value, '장소':$('#e_place').value.trim(), '내용':$('#e_text').value.trim(), '조치':$('#e_action').value.trim(), '후속조치':$('#e_follow').value.trim(), '재확인시각':dt($('#e_re').value), photos:NEWP };
+  const u = { by:ME, '상태':segVal('st'), '위험도':segVal('risk'), '분류':$('#e_cat').value, '장소':$('#e_place').value.trim(), '내용':$('#e_text').value.trim(), '조치':$('#e_action').value.trim(), '후속조치':$('#e_follow').value.trim(), '재확인시각':dt($('#e_re').value), '완료시각':dt($('#e_done').value), photos:NEWP };
+  if (u['상태']==='완료' && !u['완료시각']) u['완료시각'] = dt(nowL());
+  if (u['상태']!=='완료') u['완료시각'] = '';
   $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
-  try { await run('updRec', PW, id, u); toast('✅ 저장됨'); D = await run('loadAll', PW); closeSheet(); }
+  try { await run('updRec', PW, id, u); toast('✅ 저장됨'); D = norm(await run('loadAll', PW)); closeSheet(); }
   catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='저장'; }
 }
 </script>
