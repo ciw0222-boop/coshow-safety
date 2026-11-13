@@ -45,6 +45,14 @@ textarea{min-height:90px}
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#e7ecf5;color:#0b1220;padding:10px 16px;border-radius:99px;font-weight:700;display:none;z-index:20}
 .over{color:#ff8f87;font-weight:700}
 .thumbs a{color:#8cb4ff;font-size:13px;margin-right:8px}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}
+.stat div{background:#121c33;border:1px solid #22304d;border-radius:12px;padding:10px;text-align:center;font-size:13px;color:#b9c6de}
+.stat b{display:block;font-size:24px;color:#e7ecf5}
+.bars h3{font-size:14px;margin:18px 0 6px;color:#ffd4d1}
+.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.bar span{width:110px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar i{display:block;height:14px;background:#e8493f;border-radius:4px;min-width:2px}
+.bar em{font-style:normal;color:#b9c6de}
 </style>
 </head>
 <body>
@@ -69,6 +77,7 @@ textarea{min-height:90px}
     <button data-t="con" onclick="tab('con')">연락망</button>
     <button data-t="duty" onclick="tab('duty')">근무표</button>
     <button data-t="med" onclick="tab('med')">의료</button>
+    <button data-t="adm" id="admTab" style="display:none" onclick="tab('adm')">📊 관리</button>
   </nav>
 </header>
 <main id="main"></main>
@@ -104,6 +113,7 @@ async function doLogin(auto){
     PW = pw; ME = me || ME; LS.set('sr_pw', PW); LS.set('sr_me', ME);
     $('#login').style.display = 'none'; $('#app').style.display = 'block';
     $('#title').textContent = '🛟 ' + D.event + ' 안전상황실';
+    $('#admTab').style.display = D.admin ? '' : 'none';
     render(); setInterval(refresh, 30000);
   } catch (e) {
     LS.del('sr_pw');
@@ -117,7 +127,51 @@ function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.class
 function render(){
   const open = D.rec.filter(r=>r['상태']!=='종결').length;
   $('#sub').textContent = (ME?ME+' · ':'') + '진행 중 ' + open + '건 · ' + D.now + ' 기준';
-  ({rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed})[CUR]();
+  ({rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed,adm:renderAdm})[CUR]();
+}
+
+// ── 관리 화면: 관리자 비밀번호로 들어온 사람만 탭이 보임
+function cnt(list, key){ const m = {}; list.forEach(r => { const k = key(r) || '(빈칸)'; m[k] = (m[k] || 0) + 1; }); return m; }
+function bars(title, m, order){
+  const ks = order || Object.keys(m).sort((a, b) => m[b] - m[a]);
+  const mx = Math.max(1, ...ks.map(k => m[k] || 0));
+  return `<h3>${title}</h3>` + (ks.length ? ks.map(k => `<div class="bar"><span>${esc(k)}</span><i style="width:${Math.round((m[k] || 0) / mx * 55)}%"></i><em>${m[k] || 0}</em></div>`).join('') : '<p class="muted">없음</p>');
+}
+function renderAdm(){
+  const R = D.rec, nowT = new Date(D.now.replace(' ','T')+':00');
+  const st = cnt(R, r => r['상태']), rk = cnt(R, r => r['위험도']);
+  const over = R.filter(r => r['재확인시각'] && r['상태'] !== '종결' && new Date(r['재확인시각'].replace(' ','T')+':00') <= nowT).length;
+  const ev = ['11-18','11-19','11-20','11-21'];
+  const day = cnt(R, r => (r['접수시각'] || '').slice(5, 10));
+  const hr = cnt(R, r => (r['접수시각'] || '').slice(11, 13) + '시');
+  let h = `<div class="stat"><div><b>${R.length}</b>전체</div><div><b>${st['접수'] || 0}</b>접수</div><div><b>${st['처리중'] || 0}</b>처리중</div>
+    <div><b>${st['종결'] || 0}</b>종결</div><div><b style="color:#ff6b6b">${rk['고'] || 0}</b>고위험</div><div><b style="color:#ffb020">${over}</b>재확인 지남</div></div>
+    <button class="btn full" onclick="dlXlsx()">📥 엑셀 받기 (탭 4개)</button><div class="bars">`;
+  h += bars('위험도별', rk, ['고','중','저']);
+  h += bars('날짜별 (행사 11. 18.~21.)', day, ev.concat(Object.keys(day).filter(k => !ev.includes(k)).sort()));
+  h += bars('시간대별', hr, Object.keys(hr).sort());
+  h += bars('분류별', cnt(R, r => r['분류']));
+  h += bars('장소별', cnt(R, r => r['장소']));
+  h += bars('기록자별', cnt(R, r => r['기록자']));
+  $('#main').innerHTML = h + '</div>';
+}
+function loadXlsxLib(){ return window.XLSX ? Promise.resolve() : new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https:\/\/cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'; s.onload = ok; s.onerror = () => no(new Error('엑셀 도구를 못 불러왔어요')); document.head.appendChild(s); }); }
+async function dlXlsx(){
+  try {
+    toast('엑셀 만드는 중…'); await loadXlsxLib();
+    const H = { 상황기록: ['ID','접수시각','기록자','장소','분류','위험도','상태','내용','조치','후속조치','재확인시각','사진','수정시각','처리이력'],
+      연락망: ['구분','이름','역할','전화','비고'], 근무표: ['날짜','시작','끝','위치','이름','역할','전화'], 의료: ['구분','이름','주소','전화','운영','거리','출처'] };
+    const src = { 상황기록: D.rec.slice().reverse(), 연락망: D.con, 근무표: D.duty, 의료: D.med };
+    const wide = ['내용','조치','후속조치','처리이력','주소','운영','출처','사진'];
+    const wb = XLSX.utils.book_new();
+    Object.keys(H).forEach(n => {
+      const ws = XLSX.utils.aoa_to_sheet([H[n]].concat(src[n].map(r => H[n].map(k => r[k] || ''))));
+      ws['!cols'] = H[n].map(k => ({ wch: wide.includes(k) ? 40 : 14 }));
+      XLSX.utils.book_append_sheet(wb, ws, n);
+    });
+    XLSX.writeFile(wb, 'CO-SHOW_안전상황실_' + D.now.replace(/[-: ]/g, '') + '.xlsx');
+    toast('✅ 엑셀 받았어요');
+  } catch (e) { toast('❌ ' + (e.message || e)); }
 }
 
 function renderRec(){
