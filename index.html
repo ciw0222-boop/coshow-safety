@@ -90,6 +90,23 @@ textarea{min-height:96px;line-height:1.5}
 .bar span{width:110px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar i{display:block;height:12px;background:linear-gradient(90deg,#ff5a4e,#ff8a5c);border-radius:6px;min-width:3px}
 .bar em{font-style:normal;color:var(--mute);font-weight:700}
+.cbar{display:flex;gap:8px;margin-bottom:12px}
+.cbar select{flex:0 0 46%;font-weight:700}
+.cbar input{flex:1;min-width:0}
+.clist{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.lhead{display:flex;justify-content:space-between;padding:9px 14px;background:#0f182c;font-size:13px;font-weight:800;color:#ffc9c4;border-bottom:1px solid var(--line)}
+.lhead span{color:var(--mute);font-weight:600}
+.crow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.crow:last-child{border-bottom:0}
+.crow.open{background:#17213a}
+.cinfo{flex:1;min-width:0}
+.cname{font-size:16px;font-weight:800}
+.crole{font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow.open .crole{white-space:normal}
+.rb{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid #2e3e62;text-decoration:none;font-size:18px}
+.rb.t{background:rgba(52,201,138,.16);border-color:rgba(52,201,138,.55)}
+.cmore{flex-basis:100%;padding:2px 0 4px}
+.cmore .tel{margin-top:0}
 </style>
 </head>
 <body>
@@ -131,7 +148,7 @@ textarea{min-height:96px;line-height:1.5}
 // 구글 웹앱 틀 안에서는 저장소가 막힐 수 있어 오류가 나도 멈추지 않게
 const LS = { get(k){ try { return localStorage.getItem(k) || '' } catch(e){ return '' } }, set(k,v){ try { localStorage.setItem(k,v) } catch(e){} }, del(k){ try { localStorage.removeItem(k) } catch(e){} } };
 let PW = LS.get('sr_pw'), ME = LS.get('sr_me');
-let D = null, CUR = 'rec', FIL = '진행', NEWP = [];
+let D = null, CUR = 'rec', FIL = '진행', NEWP = [], CONG = '전체', CONQ = '', CONO = -1;
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const telOf = s => String(s || '').replace(/[^0-9+]/g, '');
@@ -235,12 +252,33 @@ function callBtns(p){ const ns = String(p || '').split(/[,\/·]/).map(telOf).fil
 
 function renderCon(){
   if (!D.con.length) { $('#main').innerHTML = '<div class="empty"><i>📞</i>연락망이 비어 있어요<br>구글 시트 「연락망」 탭에 적으면 여기에 떠요</div>'; return; }
-  let h = '', g = '';
+  // 검색칸에 쓰는 중이면(30초 새로고침) 목록만 다시 그려 글자·커서가 날아가지 않게
+  if ($('#cq') && document.activeElement === $('#cq')) return renderConList();
   const n = cnt(D.con, c => c['구분']);
-  D.con.forEach(c=>{ if (c['구분']!==g){ g=c['구분']; h+=`<div class="date">${esc(g||'기타')} <span>${n[g||'(빈칸)']||''}명</span></div>`; }
+  $('#main').innerHTML = `<div class="cbar"><select id="cg" onchange="CONG=this.value;CONO=-1;renderConList()">`
+    + [['전체', D.con.length]].concat(Object.keys(n).map(k => [k, n[k]])).map(([k, v]) => `<option value="${esc(k)}" ${k===CONG?'selected':''}>${esc(k.replace('컨소시엄 ','').replace(' 담당자',''))} (${v})</option>`).join('')
+    + `</select><input id="cq" type="search" placeholder="🔍 이름·소속 찾기" value="${esc(CONQ)}" oninput="CONQ=this.value;CONO=-1;renderConList()"></div><div id="clist"></div>`;
+  renderConList();
+}
+function nums(p){ return String(p || '').split(/[,\/·]/).map(telOf).filter(Boolean); }
+function renderConList(){
+  const q = CONQ.trim().toLowerCase().replace(/\s+/g, '');
+  const list = D.con.map((c, i) => [c, i]).filter(([c]) => (CONG === '전체' || c['구분'] === CONG)
+    && (!q || [c['이름'], c['역할'], c['비고'], c['구분'], c['전화'], telOf(c['전화'])].join(' ').toLowerCase().replace(/\s+/g, '').includes(q)));
+  if (!list.length) { $('#clist').innerHTML = '<div class="empty"><i>🔍</i>찾는 사람이 없어요</div>'; return; }
+  let h = '', g = null;
+  const n = cnt(list.map(x => x[0]), c => c['구분']);
+  list.forEach(([c, i]) => {
+    if (c['구분'] !== g) { if (g !== null) h += '</div>'; g = c['구분']; h += `<div class="clist"><div class="lhead">${esc(g || '기타')}<span>${n[g || '(빈칸)']}명</span></div>`; }
+    const ns = nums(c['전화']), m = ns.find(t => /^01/.test(t)), t1 = m || ns[0], open = i === CONO;
     const mail = /@/.test(c['비고']);
-    h += `<div class="card"><div class="who">${esc(c['이름'])}</div><div class="role">${esc(c['역할'])}</div>${c['전화']?`<div class="tel">${esc(c['전화'])}</div>`:''}${c['비고']?`<div class="${mail?'mail':'info'}">${mail?'✉️ ':''}${esc(c['비고'])}</div>`:''}${callBtns(c['전화'])}</div>`; });
-  $('#main').innerHTML = h;
+    h += `<div class="crow ${open?'open':''}" onclick="CONO=(CONO===${i}?-1:${i});renderConList()">
+      <div class="cinfo"><div class="cname">${esc(c['이름'])}</div><div class="crole">${esc(c['역할'])}</div></div>
+      ${m ? `<a class="rb" href="sms:${m}" onclick="event.stopPropagation()">💬</a>` : ''}${t1 ? `<a class="rb t" href="tel:${t1}" onclick="event.stopPropagation()">📞</a>` : ''}
+      ${open ? `<div class="cmore">${c['전화'] ? `<div class="tel">${esc(c['전화'])}</div>` : '<div class="info">번호 없음</div>'}${c['비고'] ? `<div class="${mail?'mail':'info'}">${mail?'✉️ ':''}${esc(c['비고'])}</div>` : ''}${ns.length > 1 ? `<div onclick="event.stopPropagation()">${callBtns(c['전화'])}</div>` : ''}</div>` : ''}
+    </div>`;
+  });
+  $('#clist').innerHTML = h + '</div>';
 }
 
 function renderDuty(){
