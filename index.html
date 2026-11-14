@@ -158,6 +158,28 @@ img.ld{opacity:.25}
 #pv img{max-width:96vw;max-height:80vh;border-radius:10px}
 #pv .pvbar{display:flex;gap:10px;align-items:center;color:#cfd8ea;font-weight:700}
 #pv button{padding:10px 16px;border-radius:99px;border:1px solid #3a4a72;background:#131c31;color:#fff;font-size:15px;font-weight:700;font-family:inherit}
+.rsw{display:flex;gap:6px;margin-bottom:12px}.rsw button{flex:1;padding:11px 0;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:#c9d4ea;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.rsw button.on{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 4px 14px var(--glow)}
+.rtot{background:linear-gradient(135deg,rgba(47,107,255,.22),rgba(22,184,224,.14));border:1px solid rgba(56,189,248,.4);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+.rtot .t{color:#bfe6ff;font-size:13.5px;font-weight:700}.rtot .big{font-size:40px;font-weight:800;line-height:1.15}.rtot .big small{font-size:16px;color:var(--mute);margin-left:4px}
+.rtot .sub{display:flex;flex-wrap:wrap;gap:4px 14px;color:#cfe0f7;font-size:13.5px;font-weight:700;margin-top:4px}
+.rgrid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+@media(min-width:900px){.rgrid{grid-template-columns:repeat(3,1fr)}}
+.rcard{background:rgba(19,28,49,.9);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.rcard h3{display:flex;align-items:center;gap:6px;margin:0;font-size:16px;font-weight:800}
+.rcard h3 span{margin-left:auto;color:var(--mute);font-size:12.5px;font-weight:700}
+.rcard .big{font-size:34px;font-weight:800;line-height:1.2;margin-top:6px}.rcard .big small{font-size:14px;color:var(--mute);font-weight:700;margin-left:3px}
+.rcard .vs{color:var(--mute);font-size:13.5px;font-weight:700}
+.pbar{height:10px;border-radius:6px;background:#0c1428;overflow:hidden;margin:8px 0 4px;border:1px solid #22304d}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#2f6bff,#22d3ee);box-shadow:0 0 8px rgba(56,160,255,.4)}
+.gnum{flex:none;text-align:right;font-size:13px;color:var(--mute);font-weight:700;line-height:1.35}.gnum b{display:block;font-size:17px;color:var(--text)}
+.crow.ok{background:rgba(31,157,104,.1)}.crow.ok .gnum b{color:#6ee7b7}
+.cnt{display:flex;gap:6px;align-items:stretch}.cnt input{font-size:28px;font-weight:800;text-align:center;padding:8px}
+.cnt button{flex:none;width:58px;border-radius:12px;border:1px solid #2e3e62;background:var(--panel2);color:#fff;font-size:17px;font-weight:800;font-family:inherit;cursor:pointer}
+.qadd{display:flex;gap:6px;margin-top:6px}.qadd button{flex:1;padding:10px 0;border-radius:12px;border:1px solid #2e3e62;background:#0c1428;color:#c9d4ea;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
+.ghint{margin-top:8px;padding:9px 11px;border-radius:10px;background:rgba(56,189,248,.1);color:#cfe8ff;font-size:13.5px;font-weight:600}
+.rlog{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 14px;border-bottom:1px solid var(--line);font-size:14px}.rlog:last-child{border-bottom:0}
+.rlog .n{flex:none;font-size:17px;font-weight:800;min-width:56px;text-align:right}
+.rlog .x{flex:none;padding:6px 10px;border-radius:9px;border:1px solid rgba(255,90,78,.45);background:transparent;color:#ff8f87;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -181,6 +203,7 @@ img.ld{opacity:.25}
   <nav>
     <button data-t="rec" class="on" onclick="tab('rec')"><i>🚨</i>상황기록</button>
     <button data-t="board" onclick="tab('board')"><i>📋</i>상황판</button>
+    <button data-t="reg" onclick="tab('reg')"><i>🎫</i>등록</button>
     <button data-t="con" onclick="tab('con')"><i>📞</i>연락망</button>
     <button data-t="duty" onclick="tab('duty')"><i>🕒</i>근무표</button>
     <button data-t="med" onclick="tab('med')"><i>🏥</i>의료</button>
@@ -228,20 +251,21 @@ async function doLogin(auto){
     $('#login').style.display = 'none'; $('#app').style.display = 'block';
     $('#title').textContent = '⛑️ ' + D.event + ' 안전상황실';
     $('#admTab').style.display = D.admin ? '' : 'none';
-    render(); setInterval(refresh, 30000);
+    if (/reg|%EB%93%B1%EB%A1%9D|등록/.test(location.hash)) { REGV = 'in'; tab('reg'); } else render();
+    setInterval(refresh, 30000);
   } catch (e) {
     LS.del('sr_pw');
     $('#loginMsg').textContent = auto ? '' : '❌ ' + (e.message || e);
   }
 }
-async function refresh(){ try { D = norm(await run('loadAll', PW)); if (!$('#sheet').style.display || $('#sheet').style.display==='none') render(); } catch(e){} }
+async function refresh(){ try { D = norm(await run('loadAll', PW)); if (CUR === 'reg' && REGV === 'in') { rHint(); regList(); return; } if (!$('#sheet').style.display || $('#sheet').style.display==='none') render(); } catch(e){} }
 
-function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#fab').style.display=t==='rec'?'block':'none';$('#main').classList.toggle('wide',t==='board');render()}
+function tab(t){CUR=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#fab').style.display=t==='rec'?'block':'none';$('#main').classList.toggle('wide',t==='board'||(t==='reg'&&REGV==='board'));render()}
 
 function render(){
   const open = D.rec.filter(r=>r['상태']!=='완료').length;
   $('#sub').textContent = (ME?ME+' · ':'') + '진행 중 ' + open + '건 · ' + D.now + ' 기준';
-  ({board:renderBoard,rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed,adm:renderAdm})[CUR]();
+  ({board:renderBoard,rec:renderRec,con:renderCon,duty:renderDuty,med:renderMed,adm:renderAdm,reg:renderReg})[CUR]();
 }
 
 // ── 관리 화면: 관리자 비밀번호로 들어온 사람만 탭이 보임
@@ -495,6 +519,130 @@ async function saveRec(id){
   $('#saveBtn').disabled = true; $('#saveBtn').textContent = '저장 중…';
   try { await run('updRec', PW, id, u); toast('✅ 저장됨'); D = norm(await run('loadAll', PW)); closeSheet(); }
   catch(e){ toast('❌ 저장 실패'); $('#saveBtn').disabled=false; $('#saveBtn').textContent='저장'; }
+}
+// ── 등록: 등록현황판(사전 숫자 대비 현장 입장) + 담당자 입장 수 입력
+const RK = ['일반', '단체', '선수단'], RDAYS = ['2026-11-18', '2026-11-19', '2026-11-20', '2026-11-21'], RDN = { '2026-11-18': '18(수)', '2026-11-19': '19(목)', '2026-11-20': '20(금)', '2026-11-21': '21(토)' };
+let REGV = LS.get('sr_regv') || 'board', REGD = '전체', RIK = LS.get('sr_rk') || '일반', RDEL = '';
+function rToday(){ const t = String(D.now || '').slice(0, 10); return RDAYS.includes(t) ? t : RDAYS[0]; }
+function rN(v){ return Number(v) || 0; }
+function rSum(list){ return list.reduce((a, r) => a + rN(r['인원']), 0); }
+function rv(v){ REGV = v; LS.set('sr_regv', v); $('#main').classList.toggle('wide', v === 'board'); render(); }
+function renderReg(){
+  if (!D.plan) { $('#main').innerHTML = '<div class="empty"><i>⏳</i>서버가 아직 옛 버전이에요</div>'; return; }
+  $('#main').classList.toggle('wide', REGV === 'board');
+  const sw = `<div class="rsw"><button class="${REGV==='board'?'on':''}" onclick="rv('board')">📈 등록현황판</button><button class="${REGV==='in'?'on':''}" onclick="rv('in')">✍️ 입장 수 넣기</button></div>`;
+  $('#main').innerHTML = sw + (REGV === 'board' ? regBoard() : regIn());
+  if (REGV === 'in') { rKind(RIK, true); regList(); }
+}
+function regBoard(){
+  const f = r => REGD === '전체' || r['날짜'] === REGD;
+  const reg = (D.reg || []).filter(f), plan = D.plan || [];
+  const by = k => reg.filter(r => r['구분'] === k);
+  let h = '<div class="filters">' + ['전체'].concat(RDAYS).map(d => `<button class="${REGD===d?'on':''}" onclick="REGD='${d}';render()">${d==='전체'?'전체 기간':RDN[d]}<b>${rSum((D.reg||[]).filter(r => d==='전체' || r['날짜']===d))}</b></button>`).join('') + '</div>';
+  h += `<div class="rtot"><div class="t">🎫 ${REGD==='전체'?'전체 기간':RDN[REGD]} 현장 입장 (등록데스크 입력)</div><div class="big">${rSum(reg).toLocaleString()}<small>명</small></div>
+    <div class="sub">${RK.map(k => `<span>${k} ${rSum(by(k)).toLocaleString()}</span>`).join('')}</div></div><div class="rgrid">`;
+  RK.forEach(k => {
+    const now = rSum(by(k)), pl = plan.filter(r => r['구분'] === k && (k === '일반' || f(r))), pre = rSum(pl);
+    const ic = { 일반: '🙋', 단체: '🚌', 선수단: '🏆' }[k];
+    let sub;
+    if (k === '일반') sub = `<div class="vs">사전등록 ${pre.toLocaleString()}명 <span class="muted">(${esc((pl[0]||{})['비고']||'')})</span></div>`;
+    else {
+      const ok = pl.filter(p => reg.some(r => r['구분'] === k && r['이름'] === p['이름'])).length;
+      const pc = pre ? Math.round(now / pre * 100) : 0;
+      sub = `<div class="pbar"><i style="width:${Math.min(100, pc)}%"></i></div><div class="vs">신청 ${pre.toLocaleString()}명 중 ${pc}% · 도착 ${ok}/${pl.length}${k==='단체'?'곳':'개 대회'}</div>`;
+    }
+    h += `<div class="rcard"><h3>${ic} ${k === '일반' ? '일반 참관객' : k === '단체' ? '단체 참관객' : '경진대회 선수단'}<span>${by(k).length}번 입력</span></h3><div class="big">${now.toLocaleString()}<small>명 입장</small></div>${sub}</div>`;
+  });
+  h += '</div>';
+  if (REGD === '전체') {
+    const m = {}; RDAYS.forEach(d => m[RDN[d]] = rSum((D.reg||[]).filter(r => r['날짜'] === d)));
+    h += '<div class="bars">' + bars('날짜별 현장 입장', m, RDAYS.map(d => RDN[d]));
+  } else {
+    const m = {}; reg.forEach(r => { const k = String(r['입력시각']).slice(11, 13) + '시'; m[k] = (m[k] || 0) + rN(r['인원']); });
+    h += '<div class="bars">' + bars(RDN[REGD] + ' 시간대별 입장 (입력 시각 기준)', m, Object.keys(m).sort());
+  }
+  h += '</div>';
+  ['단체', '선수단'].forEach(k => {
+    const pl = plan.filter(r => r['구분'] === k && f(r)).slice().sort((a, b) => (a['날짜'] || '9').localeCompare(b['날짜'] || '9') || String(a['비고']).localeCompare(String(b['비고'])));
+    const names = pl.map(p => p['이름']);
+    const extra = {}; reg.filter(r => r['구분'] === k && !names.includes(r['이름'])).forEach(r => extra[r['이름']] = (extra[r['이름']] || 0) + rN(r['인원']));
+    if (!pl.length && !Object.keys(extra).length) return;
+    h += `<div class="clist" style="margin-top:12px"><div class="lhead">${k === '단체' ? '🚌 단체별' : '🏆 경진대회별'}<span>✅ 도착 · 입장 / 신청</span></div>`;
+    pl.forEach(p => {
+      const n = rSum(reg.filter(r => r['구분'] === k && r['이름'] === p['이름']));
+      h += `<div class="crow ${n ? 'ok' : ''}" style="cursor:default"><div class="cinfo"><div class="cname">${n ? '✅ ' : ''}${esc(p['이름'])}</div><div class="crole">${p['날짜'] ? RDN[p['날짜']] || esc(p['날짜']) : '날짜 미정'} · ${esc(p['비고'])}</div></div><div class="gnum"><b>${n}</b>/ ${rN(p['인원'])}명</div></div>`;
+    });
+    Object.keys(extra).forEach(nm => h += `<div class="crow ok" style="cursor:default"><div class="cinfo"><div class="cname">✅ ${esc(nm)}</div><div class="crole">신청 명단에 없음 (현장 입력)</div></div><div class="gnum"><b>${extra[nm]}</b>명</div></div>`);
+    h += '</div>';
+  });
+  return h;
+}
+function regIn(){
+  const d0 = rToday();
+  return `<div class="card">
+    <label style="margin-top:0">구분</label><div class="seg" id="rkind">${RK.map(k => `<button type="button" class="${k===RIK?'on':''}" onclick="rKind('${k}')">${k}</button>`).join('')}</div>
+    <label>날짜</label><select id="rday" onchange="rKind(RIK, true)">${RDAYS.map(d => `<option value="${d}" ${d===d0?'selected':''}>${RDN[d]}</option>`).join('')}</select>
+    <div id="rnameBox"></div>
+    <label>입장 인원</label>
+    <div class="cnt"><button type="button" onclick="rAdd(-1)">−</button><input id="rn" type="number" inputmode="numeric" min="1" placeholder="0"><button type="button" onclick="rAdd(1)">＋</button></div>
+    <div class="qadd"><button type="button" onclick="rAdd(5)">+5</button><button type="button" onclick="rAdd(10)">+10</button><button type="button" onclick="rAdd(50)">+50</button><button type="button" onclick="$('#rn').value=''">지우기</button></div>
+    <label>메모 (선택)</label><input id="rnote" placeholder="예: 인솔교사 2명 포함">
+    <p></p><button class="btn full" id="rsave" onclick="saveReg()">입장 ${'수'} 저장</button>
+    <p class="muted" style="margin:8px 2px 0">입력자: ${esc(ME || '')} · 잘못 넣었으면 관리자에게 말해 주세요</p>
+  </div><div class="clist"><div class="lhead">최근 입력<span id="rlistDay"></span></div><div id="rlist"></div></div>`;
+}
+function rKind(k, keep){
+  RIK = k; LS.set('sr_rk', k);
+  document.querySelectorAll('#rkind button').forEach(b => b.classList.toggle('on', b.textContent === k));
+  const box = $('#rnameBox'); if (!box) return;
+  const prev = keep && $('#rname') ? $('#rname').value : '';
+  if (k === '일반') { box.innerHTML = ''; regList(); return; }
+  const day = $('#rday').value;
+  const pl = (D.plan || []).filter(r => r['구분'] === k);
+  const a = pl.filter(r => r['날짜'] === day), b = pl.filter(r => r['날짜'] !== day);
+  const o = r => `<option value="${esc(r['이름'])}" ${r['이름']===prev?'selected':''}>${esc(r['이름'])} (${rN(r['인원'])}명${r['날짜'] && r['날짜'] !== day ? ' · ' + (RDN[r['날짜']] || r['날짜']) : ''})</option>`;
+  box.innerHTML = `<label>${k === '단체' ? '단체(학교) 이름' : '경진대회'}</label><select id="rname" onchange="rHint()"><option value="">선택</option>`
+    + (a.length ? `<optgroup label="${RDN[day]} 예정">${a.map(o).join('')}</optgroup>` : '')
+    + (b.length ? `<optgroup label="다른 날 · 날짜 미정">${b.map(o).join('')}</optgroup>` : '')
+    + `<option value="__etc">기타 (직접 입력)</option></select><input id="retc" style="display:none;margin-top:6px" placeholder="이름을 적어 주세요"><div id="rhint"></div>`;
+  rHint(); regList();
+}
+function rName(){ const v = $('#rname') ? $('#rname').value : ''; return v === '__etc' ? ($('#retc').value || '').trim() : v; }
+function rHint(){
+  const s = $('#rname'); if (!s) return;
+  $('#retc').style.display = s.value === '__etc' ? 'block' : 'none';
+  const p = (D.plan || []).find(r => r['구분'] === RIK && r['이름'] === s.value);
+  if (!p) { $('#rhint').innerHTML = ''; return; }
+  const got = rSum((D.reg || []).filter(r => r['구분'] === RIK && r['이름'] === p['이름'])), left = rN(p['인원']) - got;
+  $('#rhint').innerHTML = `<div class="ghint">신청 ${rN(p['인원'])}명 · 지금까지 입장 ${got}명${left > 0 ? ` · <a href="#" style="color:#7dd3fc;font-weight:800" onclick="$('#rn').value=${left};return false">남은 ${left}명 넣기</a>` : ''}<br><span class="muted">${esc(p['비고'])}</span></div>`;
+}
+function rAdd(n){ const i = $('#rn'); i.value = Math.max(0, rN(i.value) + n) || ''; }
+function regList(){
+  const el = $('#rlist'); if (!el) return;
+  const day = $('#rday') ? $('#rday').value : rToday();
+  $('#rlistDay').textContent = RDN[day] + ' · ' + rSum((D.reg || []).filter(r => r['날짜'] === day)) + '명';
+  const L = (D.reg || []).filter(r => r['날짜'] === day).slice().reverse().slice(0, 40);
+  el.innerHTML = L.length ? L.map(r => `<div class="rlog"><div class="cinfo"><div style="font-weight:800">${esc(r['구분'])}${r['이름'] ? ' · ' + esc(r['이름']) : ''}</div><div class="crole">${esc(String(r['입력시각']).slice(11))} · ${esc(r['입력자'])}${r['비고'] ? ' · ' + esc(r['비고']) : ''}</div></div><div class="n">${rN(r['인원'])}명</div>${D.admin ? `<button class="x" onclick="rDel('${esc(r['ID'])}', this)">${RDEL === r['ID'] ? '한 번 더' : '🗑'}</button>` : ''}</div>`).join('')
+    : '<p class="muted" style="padding:12px 14px;margin:0">아직 없어요</p>';
+}
+async function saveReg(){
+  const n = rN($('#rn').value), name = RIK === '일반' ? '' : rName();
+  if (n < 1) { toast('인원을 넣어 주세요'); return; }
+  if (RIK !== '일반' && !name) { toast('이름을 골라 주세요'); return; }
+  const btn = $('#rsave'); btn.disabled = true; btn.textContent = '저장 중…';
+  try {
+    await run('addReg', PW, { kind: RIK, name, day: $('#rday').value, n, note: $('#rnote').value.trim(), by: ME });
+    D = norm(await run('loadAll', PW));
+    toast('✅ ' + (name || RIK) + ' ' + n + '명 저장');
+    $('#rn').value = ''; $('#rnote').value = ''; rHint(); regList();
+  } catch (e) { toast('❌ ' + (e.message || '저장 실패')); }
+  btn.disabled = false; btn.textContent = '입장 수 저장';
+}
+async function rDel(id, b){
+  if (RDEL !== id) { RDEL = id; regList(); return; }
+  RDEL = ''; b.disabled = true;
+  try { await run('delReg', PW, id, ME); D = norm(await run('loadAll', PW)); toast('🗑 지웠어요'); } catch (e) { toast('❌ ' + (e.message || '지우기 실패')); }
+  rHint(); regList();
 }
 </script>
 </body>
