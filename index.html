@@ -205,7 +205,6 @@ img.ld{opacity:.25}
     <button data-t="board" onclick="tab('board')"><i>📋</i>상황판</button>
     <button data-t="reg" onclick="tab('reg')"><i>🎫</i>등록</button>
     <button data-t="con" onclick="tab('con')"><i>📞</i>연락망</button>
-    <button data-t="duty" onclick="tab('duty')"><i>🕒</i>근무표</button>
     <button data-t="med" onclick="tab('med')"><i>🏥</i>의료</button>
     <button data-t="adm" id="admTab" style="display:none" onclick="tab('adm')"><i>📊</i>관리</button>
   </nav>
@@ -298,8 +297,8 @@ async function dlXlsx(){
   try {
     toast('엑셀 만드는 중…'); await loadXlsxLib();
     const H = { 상황기록: ['ID','접수시각','기록자','장소','분류','위험도','상태','내용','조치','후속조치','재확인시각','완료시각','사진','수정시각','처리이력'],
-      연락망: ['구분','이름','역할','전화','비고'], 근무표: ['날짜','시작','끝','위치','이름','역할','전화'], 의료: ['구분','이름','주소','전화','운영','거리','출처'] };
-    const src = { 상황기록: D.rec.slice().reverse(), 연락망: D.con, 근무표: D.duty, 의료: D.med };
+      연락망: ['구분','이름','역할','전화','비고'], 의료: ['구분','이름','주소','전화','운영','거리','출처'] };
+    const src = { 상황기록: D.rec.slice().reverse(), 연락망: D.con, 의료: D.med };
     const wide = ['내용','조치','후속조치','처리이력','주소','운영','출처','사진'];
     const wb = XLSX.utils.book_new();
     Object.keys(H).forEach(n => {
